@@ -1,4 +1,5 @@
-<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&height=150&section=header&text=ChatUnity%20-%20X%20Roshidere&fontSize=30&fontColor=FFFFFF&animation=fadeIn" width="100%"/> 
+
+
 
 <p align="center">
   <img src="https://i.ibb.co/PvKDcRKW/alyaxroshidere-jpeg.jpg"  style="width: 100%; height: auto; max-width: 400px;">
