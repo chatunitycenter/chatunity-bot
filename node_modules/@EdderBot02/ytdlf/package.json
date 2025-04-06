@@ -1,0 +1,20 @@
+{
+  "name": "@EdderBot02/ytdlf",
+  "version": "1.2.3",
+  "description": "A simple YouTube video downloader for audio and video formats with resolusi and quality.",
+  "main": "main.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "keywords": [
+    "youtube",
+    "ytdl-core",
+    "video"
+  ],
+  "author": "Enigma Team",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.27.2"
+  }
+}

@@ -1,0 +1,48 @@
+{
+    "name": "@types/fluent-ffmpeg",
+    "version": "2.1.27",
+    "description": "TypeScript definitions for fluent-ffmpeg",
+    "homepage": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/fluent-ffmpeg",
+    "license": "MIT",
+    "contributors": [
+        {
+            "name": "KIM Jaesuck a.k.a. gim tcaesvk",
+            "githubUsername": "tcaesvk",
+            "url": "https://github.com/tcaesvk"
+        },
+        {
+            "name": "DingWeizhe",
+            "githubUsername": "DingWeizhe",
+            "url": "https://github.com/DingWeizhe"
+        },
+        {
+            "name": "Mounir Abid",
+            "githubUsername": "mabidina",
+            "url": "https://github.com/mabidina"
+        },
+        {
+            "name": "Doyoung Ha",
+            "githubUsername": "hados99",
+            "url": "https://github.com/hados99"
+        },
+        {
+            "name": "Prasad Nayak",
+            "githubUsername": "buzzertech",
+            "url": "https://github.com/buzzertech"
+        }
+    ],
+    "main": "",
+    "types": "index.d.ts",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/DefinitelyTyped/DefinitelyTyped.git",
+        "directory": "types/fluent-ffmpeg"
+    },
+    "scripts": {},
+    "dependencies": {
+        "@types/node": "*"
+    },
+    "peerDependencies": {},
+    "typesPublisherContentHash": "d4b5f12a5ceab07664481cac21a1d61a55eeadf6bbb95f0ba5f4875918d102d1",
+    "typeScriptVersion": "4.8"
+}

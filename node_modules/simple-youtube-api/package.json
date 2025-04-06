@@ -1,0 +1,39 @@
+{
+  "name": "simple-youtube-api",
+  "version": "5.2.1",
+  "description": "A module to simplify the YouTube API.",
+  "author": "Bryan Pikaard <hypercoder@typicalbot.com>",
+  "maintainers": [
+    "Tyler Richards <rocket0191@gmail.com>"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/simple-youtube/simple-youtube-api.git"
+  },
+  "bugs": {
+    "url": "https://github.com/simple-youtube/simple-youtube-api/issues"
+  },
+  "homepage": "https://github.com/simple-youtube/simple-youtube-api",
+  "sideEffects": false,
+  "main": "src/index.js",
+  "unpkg": "dist/sya.min.js",
+  "scripts": {
+    "build": "webpack",
+    "docs": "jsdoc -c jsdoc.json",
+    "test": "mocha"
+  },
+  "dependencies": {
+    "iso8601-duration": "^1.2.0",
+    "node-fetch": "^2.6.0"
+  },
+  "devDependencies": {
+    "dotenv": "^4.0.0",
+    "jsdoc": "^3.6.2",
+    "lodash.defaultsdeep": "^4.6.0",
+    "minami": "^1.1.0",
+    "mocha": "^3.5.3",
+    "webpack": "^4.33.0",
+    "webpack-cli": "^3.3.4"
+  }
+}

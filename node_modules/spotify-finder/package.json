@@ -1,0 +1,43 @@
+{
+  "name": "spotify-finder",
+  "version": "2.1.1",
+  "description": "A isomorphic Spotify API client",
+  "main": "lib/client.js",
+  "scripts": {
+    "lint": "standard",
+    "coverage": "istanbul cover tape -- test/test.js test/oauth-test.js test/*-test.js",
+    "pretest": "rm -rf store",
+    "test": "npm run lint && tape test/test.js test/oauth-test.js test/*-test.js | tap-spec",
+    "posttest": "rm -rf store"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luixlacrux/spotify-finder.git"
+  },
+  "bugs": {
+    "url": "https://github.com/luixlacrux/spotify-finder/issues"
+  },
+  "author": "Luis Lacruz <luixlacrux18@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "coveralls": "^2.11.14",
+    "istanbul": "^0.4.3",
+    "nock": "^8.0.0",
+    "standard": "^6.0.8",
+    "tap-spec": "^4.1.1",
+    "tape": "^4.5.1"
+  },
+  "keywords": [
+    "spotify",
+    "spotify-api",
+    "spotify-client",
+    "es6"
+  ],
+  "homepage": "https://github.com/luixlacrux/spotify-finder#readme",
+  "dependencies": {
+    "bluebird": "^3.4.6",
+    "node-localstorage": "^1.3.0",
+    "request": "^2.74.0",
+    "request-promise": "^4.1.1"
+  }
+}

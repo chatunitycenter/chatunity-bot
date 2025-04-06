@@ -1,0 +1,32 @@
+{
+  "name": "@sasmeee/igdl",
+  "version": "1.0.0",
+  "description": "A Node.js package for downloading Instagram videos, posts, stories, and more. This package provides an unofficial scraping functionality to retrieve content from Instagram",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sasmeee/igdl.git"
+  },
+  "keywords": [
+    "instagram",
+    "download",
+    "ig-downloader",
+    "instagram downloader",
+    "reels",
+    "posts"
+  ],
+  "author": "Sasmitha Ashinsana",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sasmeee/igdl/issues"
+  },
+  "homepage": "https://github.com/sasmeee/igdl#readme",
+  "dependencies": {
+    "axios": "^1.4.0",
+    "cheerio": "^1.0.0-rc.12",
+    "qs": "^6.11.2"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "libsignal-node",
+  "version": "1.0.0",
+  "description": "Open Whisper Systems' libsignal for Node.js",
+  "repository": "ds6/libsignal",
+  "main": "index.js",
+  "keywords": [
+    "signal",
+    "whispersystems",
+    "crypto"
+  ],
+  "license": "GPL-3.0",
+  "dependencies": {
+    "curve25519-js": "^0.0.4",
+    "protobufjs": "6.8.8"
+  },
+  "files": [
+    "src/*"
+  ],
+  "devDependencies": {
+    "eslint": "6.0.1"
+  }
+}
