@@ -18,8 +18,8 @@ global.owner = [
   ['421233456345', 'Kinderino', true],
   ['66621409462', 'matte', true],
   ['393509368693', 'Gab', true],
-  ['393533869409', 'Kekko', true],
-  ['393445461546', 'kekko 2', true],
+  ['xxxxxxxxxx',],
+  ['xxxxxxxxxx',],
   ['xxxxxxxxxx']
 ];
 global.mods = ['xxxxxxxxxx'];
