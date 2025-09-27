@@ -19,7 +19,7 @@ END:VCARD`
       displayName: "Owners",
       contacts: [
         { vcard: vcard1 },
-        { vcard: vcard2 }
+
       ]
     }
   }, { quoted: m })
