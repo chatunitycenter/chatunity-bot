@@ -1,39 +1,19 @@
 const handler = async (m, { conn, args }) => {
-    const metadata = await conn.groupMetadata(m.chat);
-    const groupName = metadata.subject;
+    const metadata = await conn.groupMetadata(m.chat)
+    
+    await conn.sendMessage(m.chat, {
+  text: `Link del gruppo: *${metadata.subject}*`,
+  footer: 'Clicca il bottone per copiare il link negli appunti',
+  interactiveButtons: [
+    { name: 'cta_copy', buttonParamsJson: JSON.stringify({ display_text: 'Copia', copy_code: 'https://chat.whatsapp.com/' + await conn.groupInviteCode(m.chat) }) }
+  ],
+}, { quoted: m })
+}
 
-    const interactiveButtons = [
-        {
-            name: "cta_copy",
-            buttonParamsJson: JSON.stringify({
-                display_text: "Copia",
-                id: 'https://chat.whatsapp.com/' + await conn.groupInviteCode(m.chat),
-                copy_code: 'https://chat.whatsapp.com/' + await conn.groupInviteCode(m.chat)
-            })
-        },
-        {
-            name: "quick_reply",
-            buttonParamsJson: JSON.stringify({
-                display_text: "Reimposta",
-                id: `/reimpostagruppo ${m.chat}`,
-            })
-        }
-    ];
+handler.help = ['linkgroup']
+handler.tags = ['group']
+handler.command = /^link(gro?up)?$/i
+handler.group = true
+handler.botAdmin = true
 
-    const interactiveMessage = {
-        text: `*${groupName}*`,
-        title: "Eccoti il link del gruppo:",
-        footer: "Scegli una delle seguenti opzioni:",
-        interactiveButtons
-    };
-
-    await conn.sendMessage(m.chat, interactiveMessage, { quoted: m });
-};
-
-handler.help = ['linkgroup'];
-handler.tags = ['group'];
-handler.command = /^link$/i;
-handler.group = true;
-handler.botAdmin = true;
-
-export default handler;
+export default handler

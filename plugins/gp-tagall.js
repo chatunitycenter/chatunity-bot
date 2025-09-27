@@ -1,1 +1,22 @@
-const _0x274832=_0x5c96;(function(_0x4cd2f0,_0xaa17c6){const _0x1fc4eb=_0x5c96,_0x4756b2=_0x4cd2f0();while(!![]){try{const _0x2cf6f3=-parseInt(_0x1fc4eb(0x85))/0x1+parseInt(_0x1fc4eb(0x7a))/0x2+parseInt(_0x1fc4eb(0x8c))/0x3+parseInt(_0x1fc4eb(0x80))/0x4+parseInt(_0x1fc4eb(0x7d))/0x5+-parseInt(_0x1fc4eb(0x75))/0x6*(parseInt(_0x1fc4eb(0x86))/0x7)+parseInt(_0x1fc4eb(0x7b))/0x8*(-parseInt(_0x1fc4eb(0x7e))/0x9);if(_0x2cf6f3===_0xaa17c6)break;else _0x4756b2['push'](_0x4756b2['shift']());}catch(_0x1ceb8f){_0x4756b2['push'](_0x4756b2['shift']());}}}(_0x6d1d,0xebbf1));function _0x5c96(_0x3052f3,_0x465cf1){const _0x6d1d5f=_0x6d1d();return _0x5c96=function(_0x5c9646,_0xe9ea76){_0x5c9646=_0x5c9646-0x70;let _0x92b3f=_0x6d1d5f[_0x5c9646];return _0x92b3f;},_0x5c96(_0x3052f3,_0x465cf1);}function _0x6d1d(){const _0xead5d9=['9105090WJhReu','9zYtNWl','BEGIN:VCARD\x0aVERSION:5.0\x0aN:;Unlimited;;;\x0aFN:Unlimited\x0aORG:Unlimited\x0aTITLE:\x0aitem1.TEL;waid=15395490858:+1\x20(539)\x20549-0858\x0aitem1.X-ABLabel:Unlimited\x0aX-WA-BIZ-DESCRIPTION:ofc\x0aX-WA-BIZ-NAME:Unlimited\x0aEND:VCARD','2193804DPkZgX','\x0a\x0a-_-\x20\x20𝐌𝐄𝐌𝐁𝐑𝐈\x20𝐃𝐄𝐋\x20𝐆𝐑𝐔𝐏𝐏𝐎\x20-_-\x20\x0a','sendMessage','admin','buffer','1547550TqyREK','28EUdbPu','https://i.ibb.co/9mWwC5PP/Whats-App-Image-2025-07-06-at-23-32-06.jpg','group','Halo','split','tags','69597gzJAlB','\x0a\x0a✦➤\x20','map','join','tagall\x20<mesaje>','𝐓𝐚𝐠𝐀𝐥𝐥','*:*\x20','175902UHiwjG','『💬』 ══ •⊰✰⊱• ══ 『💬』','0@s.whatsapp.net','══════\x20•⊰✦⊱•\x20══════\x20\x0a𝐁𝐎𝐓:\x20','chat','1087326ArFlqx','2447168NQEjgE','✧‌⃟ᗒ\x20@'];_0x6d1d=function(){return _0xead5d9;};return _0x6d1d();}let handler=async(_0x551f4c,{isOwner:_0x52b85f,isAdmin:_0x17546f,conn:_0x19c548,text:_0x3512ee,participants:_0x1f9a60,args:_0x46601e,command:_0x491370})=>{const _0xdb6eec=_0x5c96;if(!(_0x17546f||_0x52b85f)){global['dfail'](_0xdb6eec(0x83),_0x551f4c,_0x19c548);throw![];}let _0xe5d89b=_0x46601e[_0xdb6eec(0x71)]` `,_0x172e5c=_0xdb6eec(0x74)+_0xe5d89b,_0x5141df=_0xdb6eec(0x78)+nomebot+_0xdb6eec(0x8d)+_0x172e5c+_0xdb6eec(0x81);for(let _0x92b291 of _0x1f9a60){_0x5141df+=_0xdb6eec(0x7c)+_0x92b291['id'][_0xdb6eec(0x8a)]('@')[0x0]+'\x0a';}{_0x5141df+=_0xdb6eec(0x76);}let _0x4fb25e={'key':{'participants':_0xdb6eec(0x77),'fromMe':![],'id':_0xdb6eec(0x89)},'message':{'locationMessage':{'name':_0xdb6eec(0x73),'jpegThumbnail':await(await fetch(_0xdb6eec(0x87)))[_0xdb6eec(0x84)](),'vcard':_0xdb6eec(0x7f)}},'participant':'0@s.whatsapp.net'};_0x19c548[_0xdb6eec(0x82)](_0x551f4c[_0xdb6eec(0x79)],{'text':_0x5141df,'mentions':_0x1f9a60[_0xdb6eec(0x70)](_0x4f63bb=>_0x4f63bb['id'])},{'quoted':_0x4fb25e});};handler['help']=[_0x274832(0x72),'invocar\x20<mesaje>'],handler[_0x274832(0x8b)]=['group'],handler['command']=/^(tagall|invocar|marcar|todos|invocación)$/i,handler[_0x274832(0x83)]=!![],handler[_0x274832(0x88)]=!![];export default handler;
+//Plugin creato da Gab333 - Velocizzato
+let handler = async (m, { isOwner, isAdmin, conn, text, participants, args }) => {
+    if (!(isAdmin || isOwner)) return
+    
+    let message = args.join` ` || 'Messaggio vuoto'
+    let tagText = `🔔 MEMBRI DEL GRUPPO\n\nBOT: ${nomebot}\n${message}\n\n`
+    
+    for (let user of participants) {
+        tagText += `✧ @${user.id.split('@')[0]}\n`
+    }
+    tagText += '\n══════ •⊰✦⊱• ══════'
+    
+    conn.sendMessage(m.chat, {
+        text: tagText,
+        mentions: participants.map(p => p.id)
+    }, { quoted: m })
+}
+
+handler.command = /^(tagall|invocar|marcar|todos)$/i
+handler.group = true
+handler.admin = true
+export default handler

@@ -1,25 +1,70 @@
+import pkg from '@realvare/based'
+const { generateWAMessageFromContent } = pkg
+
 let handler = async (m, { conn }) => {
-    const createVCard = (name, number, role) => {
-        return `BEGIN:VCARD
+  // vCard primo contatto
+  let vcard1 = `BEGIN:VCARD
 VERSION:3.0
-FN:${name}
-ORG:ChatUnity;
-TEL;type=CELL;type=VOICE;waid=${number}:+${number}
-X-ABLabel:${role}
-END:VCARD`.replace(/\n/g, '\r\n');
-    };
+FN: ˙ . ᵗˢᵏ ꒷ . 𝐧𝐞𝐱𝐮𝐬 𖦹˙🪽
+ORG: Davide¹
+TEL;type=CELL;type=VOICE;waid=393518419909:+39 351 841 9909
+END:VCARD`
 
-    await conn.sendMessage(m.chat, { 
-        contacts: { 
-            displayName: 'Creatore', 
-            contacts: [
-                { vcard: createVCard('Creatore', '393515533859', 'Founder') }
+  // vCard secondo contatto
+  let vcard2 = `BEGIN:VCARD
+VERSION:3.0
+FN: ˙ . ᵗˢᵏ ꒷ . Luca 𖦹˙🪽
+ORG: Davide²
+TEL;type=CELL;type=VOICE;waid=393793399399:+39 379 339 9399
+END:VCARD`
+
+  // primo invio -> entrambi i contatti insieme
+  await conn.sendMessage(m.chat, {
+    contacts: {
+      displayName: "Owners",
+      contacts: [
+        { vcard: vcard1 },
+        { vcard: vcard2 }
+      ]
+    }
+  }, { quoted: m })
+
+  // secondo invio -> messaggio CTA URL con più bottoni
+  let msg = generateWAMessageFromContent(m.chat, {
+    viewOnceMessage: {
+      message: {
+        interactiveMessage: {
+          header: { title: "I miei social" },
+          body: { text: "Puoi cobtattarmi anche qua: 👇" },
+          footer: { text: nomebot },
+          nativeFlowMessage: {
+            buttons: [
+              {
+                name: "cta_url",
+                buttonParamsJson: JSON.stringify({
+                  display_text: "『 💻 』 GitHub",
+                  url: "https://github.com/Davjde333",
+                  merchant_url: "https://github.com/Davjde333"
+                })
+              },
+              {
+                name: "cta_url",
+                buttonParamsJson: JSON.stringify({
+                  display_text: "『 📸 』 Instagram",
+                  url: "https://instagram.com/dxvjde",
+                  merchant_url: "https://instagram.com/dxvjde"
+                })
+              }
             ]
+          }
         }
-    }, { quoted: m });
-};
+      }
+    }
+  }, { userJid: m.sender })
 
-handler.help = ['creatore'];
-handler.tags = ['info'];
-handler.command = ['creatore', ]; // ✅ Qui la correzione
-export default handler;
+  await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id })
+}
+handler.help = ['owner']
+handler.tags = ['main']
+handler.command = ['creatore'] 
+export default handler

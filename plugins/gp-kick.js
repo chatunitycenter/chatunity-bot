@@ -63,8 +63,6 @@ async function handler(m, { isBotAdmin, isOwner, text, conn }) {
 
 handler.customPrefix = /kick|avadachedavra|sparisci|puffo/i
 handler.command = new RegExp
-handler.group = true;
-handler.admin = true;
-handler.botAdmin = true;
+handler.admin = true
 
 export default handler

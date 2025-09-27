@@ -1,40 +1,22 @@
-// Codice di ADMIN_accetta-richieste.js
-
-let handler = async (m, { conn, isAdmin, isBotAdmin, participants, groupMetadata }) => {
-  if (!m.isGroup) return m.reply("Questo comando si usa solo nei gruppi.")
-  if (!isBotAdmin) return m.reply("Devo essere admin per accettare le richieste.")
-  if (!isAdmin) return m.reply("Solo gli admin del gruppo possono usare questo comando.")
-
+let handler = async (m, { conn, isAdmin, isBotAdmin }) => {
+  if (!m.isGroup || !isBotAdmin || !isAdmin) return
   try {
-    const groupId = m.chat
-    const pending = await conn.groupRequestParticipantsList(groupId)
-
-    if (!pending.length) return m.reply("Non ci sono richieste da accettare.")
-
-    let accettati = 0
-
+    const pending = await conn.groupRequestParticipantsList(m.chat)
+    if (!pending.length) return m.reply("Nessuna richiesta da accettare.")
+    let count = 0
     for (let p of pending) {
       try {
-        await conn.groupRequestParticipantsUpdate(groupId, [p.jid], 'approve')
-        accettati++
-      } catch (e) {
-        console.log(`[ERRORE] Non sono riuscito ad accettare ${p.jid}:`, e)
-      }
+        await conn.groupRequestParticipantsUpdate(m.chat, [p.jid], 'approve')
+        count++
+      } catch {}
     }
-
-    m.reply(`✅ Accettate ${accettati} richieste con successo.`)
-
-  } catch (err) {
-    console.error('[ERRORE ACCETTA]', err)
-    m.reply('Errore durante l\'accettazione delle richieste.')
+    m.reply(`✅ Accettate ${count} richieste.`)
+  } catch {
+    m.reply('Errore.')
   }
 }
-
 handler.command = ['accettarichieste']
-handler.tags = ['gruppo']
-handler.help = ['accetta - accetta tutte le richieste in sospeso']
 handler.group = true
 handler.admin = true
 handler.botAdmin = true
-
 export default handler

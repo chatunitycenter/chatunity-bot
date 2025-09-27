@@ -174,7 +174,7 @@ git clone https://github.com/chatunitycenter/chatunity-bot.git
 echo -e "\033[01;32mLa clonazione è stata scaricata e installata correttamente.\nThe clone has been downloaded and installed successfully.\n\033[0m"
 
 echo -e "\033[01;32mCambiando alla directory del repository!!\nChanging to the repository directory!!\n\033[0m" 
-cd chatunity-bot
+cd /sdcard/chatunity-bot
 
 echo -e "\e[35m
 ██╗███╗░░██╗░██████╗████████╗░█████╗░██╗░░░░░██╗░░░░░  ███╗░░██╗██████╗░███╗░░░███╗

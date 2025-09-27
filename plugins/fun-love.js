@@ -11,7 +11,7 @@ let handler = async (m, { conn, command, text }) => {
         forwardingScore: 99,
         isForwarded: true,
         forwardedNewsletterMessageInfo: {
-          newsletterJid: '120363259442839354@newsletter',
+          newsletterJid: '120363422724720651@newsletter',
           serverMessageId: '',
           newsletterName: `${nomeDelBot}`
         }

@@ -1,17 +1,20 @@
 import 'os';
 import 'util';
 import 'human-readable';
-import '@whiskeysockets/baileys';
+import '@realvare/based';
 import 'fs';
 import 'perf_hooks';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import '../lib/language.js';
 
 // Definizione di __dirname per i moduli ESM
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 let handler = async (m, { conn, usedPrefix, command }) => {
+  const userId = m.sender;
+  const groupId = m.isGroup ? m.chat : null;
   const chat = global.db.data.chats[m.chat];
   const isOwner = global.owner.map(([number]) => number + '@s.whatsapp.net').includes(m.sender);
 
@@ -60,38 +63,38 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     .join('\n');
 
   let menuText = `
-╭〔*💬 𝑴𝑬𝑵𝑼 𝐅𝐔𝐍𝐙𝐈𝐎𝐍𝐈 💬*〕┈⊷
+╭〔*💬 ${global.t('securityMenuTitle', userId, groupId) || '𝑴𝑬𝑵𝑼 𝐅𝐔𝐍𝐙𝐈𝐎𝐍𝐈'} 💬*〕┈⊷
 ┃◈╭─────────────·๏
-┃◈┃• *𝐀𝐓𝐓𝐈𝐕𝐀/𝐃𝐈𝐒𝐀𝐁𝐈𝐋𝐈𝐓𝐀*
+┃◈┃• *${global.t('activateDisable', userId, groupId) || '𝐀𝐓𝐓𝐈𝐕𝐀/𝐃𝐈𝐒𝐀𝐁𝐈𝐋𝐈𝐓𝐀'}*
 ┃◈┃
-┃◈┃• *ℹ 𝐂𝐎𝐌𝐄 𝐒𝐈 𝐔𝐒𝐀*
-┃◈┃• *🟢 attiva [funzione]* 
-┃◈┃• *🔴 disabilita [funzione]*
+┃◈┃• *ℹ ${global.t('howToUse', userId, groupId) || '𝐂𝐎𝐌𝐄 𝐒𝐈 𝐔𝐒𝐀'}*
+┃◈┃• *🟢 ${global.t('activateFunction', userId, groupId) || 'attiva [funzione]'}* 
+┃◈┃• *🔴 ${global.t('disableFunction', userId, groupId) || 'disabilita [funzione]'}*
 ┃◈╰━━━━━━━━━━━━━┈·๏
 ┃◈┃
 ${statusList.split('\n').map(line => `┃◈┃• ${line}`).join('\n')}
 ┃◈┃
 ┃◈└───────────┈⊷
-┃◈┃• *𝑽𝑬𝑹𝑺𝑰𝑶𝑵𝑬:* ${vs}
-┃◈┃•  𝐂𝐎𝐋𝐋𝐀𝐁: 𝐎𝐍𝐄 𝐏𝐈𝐄𝐂𝐄
-┃◈┃• *𝐒𝐔𝐏𝐏𝐎𝐑𝐓𝐎:* (.supporto)
+┃◈┃• *${global.t('versionLabel', userId, groupId) || '𝑽𝑬𝑹𝑺𝑰𝑶𝑵𝑬'}:* ${vs}
+┃◈┃•  ${global.t('collabLabel', userId, groupId) || '𝐂𝐎𝐋𝐋𝐀𝐁: 𝐎𝐍𝐄 𝐏𝐈𝐄𝐂𝐄'}
+┃◈┃• *${global.t('supportLabel', userId, groupId) || '𝐒𝐔𝐏𝐏𝐎𝐑𝐓𝐎'}:* (.supporto)
 ╰━━━━━━━━━━━━━┈·๏
 `.trim();
 
   // Percorso dell'immagine
-  const imagePath = path.join(__dirname, '../menu/onepiece4.jpeg');
+  const imagePath = path.join(__dirname, '../menu/sicurezza.jpeg');
 
   // Invia il menu con l'immagine e i bottoni
   await conn.sendMessage(m.chat, {
     image: { url: imagePath },
     caption: menuText,
-    footer: 'Scegli un menu:',
+    footer: global.t('chooseMenu', userId, groupId) || 'Scegli un menu:',
     buttons: [
-      { buttonId: `${usedPrefix}menu`, buttonText: { displayText: "🏠 Menu Principale" }, type: 1 },
-      { buttonId: `${usedPrefix}menuadmin`, buttonText: { displayText: "🛡️ Menu Admin" }, type: 1 },
-      { buttonId: `${usedPrefix}menuowner`, buttonText: { displayText: "👑 Menu Owner" }, type: 1 },
-      { buttonId: `${usedPrefix}menugruppo`, buttonText: { displayText: "👥 Menu Gruppo" }, type: 1 },
-      { buttonId: `${usedPrefix}menuia`, buttonText: { displayText: "🤖 Menu IA" }, type: 1 }
+      { buttonId: `${usedPrefix}menu`, buttonText: { displayText: global.t('mainMenuButton', userId, groupId) || "🏠 Menu Principale" }, type: 1 },
+      { buttonId: `${usedPrefix}menuadmin`, buttonText: { displayText: global.t('menuAdmin', userId, groupId) || "🛡️ Menu Admin" }, type: 1 },
+      { buttonId: `${usedPrefix}menuowner`, buttonText: { displayText: global.t('menuOwner', userId, groupId) || "👑 Menu Owner" }, type: 1 },
+      { buttonId: `${usedPrefix}menugruppo`, buttonText: { displayText: global.t('menuGroup', userId, groupId) || "👥 Menu Gruppo" }, type: 1 },
+      { buttonId: `${usedPrefix}menuia`, buttonText: { displayText: global.t('menuAI', userId, groupId) || "🤖 Menu IA" }, type: 1 }
     ],
     viewOnce: true,
     headerType: 4

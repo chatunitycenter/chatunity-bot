@@ -1,4 +1,4 @@
-import { delay } from '@whiskeysockets/baileys';
+import { delay } from '@realvare/based';
 
 const salasRuleta = {};
 

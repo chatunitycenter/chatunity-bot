@@ -1,3 +1,4 @@
+// Plugins fatto da Gab333 - Velocizzato
 const pinQueue = new Map();
 
 let handler = async (m, { conn, command, usedPrefix }) => {
@@ -17,12 +18,12 @@ let handler = async (m, { conn, command, usedPrefix }) => {
             text: 'Scegli per quanto tempo vuoi fissare il messaggio:',
             buttons,
             headerType: 1
-        }, { quoted: m });
+        });
         return;
     }
 
     if (['pin1d', 'pin7d', 'pin30d'].includes(command)) {
-        // Recupero il messaggio da pinnare salvato in pinQueue
+     
         const quoted = pinQueue.get(m.chat);
         if (!quoted) return m.reply('❌ Nessun messaggio da fissare. Usa prima il comando pin rispondendo a un messaggio.');
 
@@ -33,7 +34,7 @@ let handler = async (m, { conn, command, usedPrefix }) => {
             participant: quoted.sender
         };
 
-        // Calcolo durata in ms in base al comando
+
         let durationMs = 0;
         if (command === 'pin1d') durationMs = 1 * 24 * 60 * 60 * 1000;
         else if (command === 'pin7d') durationMs = 7 * 24 * 60 * 60 * 1000;
@@ -42,12 +43,12 @@ let handler = async (m, { conn, command, usedPrefix }) => {
         try {
             await conn.sendMessage(m.chat, { pin: { key: messageKey, type: 1 } });
 
-            // Conferma con il tempo in millisecondi
+           
             
 
             m.react('✅️');
 
-            // Pulisco la mappa per evitare confusione
+
             pinQueue.delete(m.chat);
         } catch (e) {
             console.error(e);
@@ -56,7 +57,7 @@ let handler = async (m, { conn, command, usedPrefix }) => {
         return;
     }
 
-    // Comandi normali unpin, destacar, desmarcar
+
     if (['unpin', 'destacar', 'desmarcar'].includes(command)) {
         if (!m.quoted) return m.reply(`⚠️ Rispondi a un messaggio per ${command === 'unpin' ? 'rimuoverlo dai fissati' : 'eseguire l\'azione'}.`);
 

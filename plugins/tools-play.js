@@ -1,4 +1,3 @@
-
 import fetch from "node-fetch";
 import yts from 'yt-search';
 import axios from "axios";
@@ -62,7 +61,7 @@ const handler = async (m, { conn, text, usedPrefix, command, args }) => {
           forwardingScore: 99,
           isForwarded: true,
           forwardedNewsletterMessageInfo: {
-            newsletterJid: '120363259442839354@newsletter',
+            newsletterJid: '120363422724720651@newsletter',
             serverMessageId: '',
             newsletterName: 'ChatUnity'
           }
@@ -81,7 +80,7 @@ const handler = async (m, { conn, text, usedPrefix, command, args }) => {
             forwardingScore: 99,
             isForwarded: true,
             forwardedNewsletterMessageInfo: {
-              newsletterJid: '120363259442839354@newsletter',
+              newsletterJid: '120363422724720651@newsletter',
               serverMessageId: '',
               newsletterName: 'ChatUnity'
             }
@@ -103,7 +102,7 @@ const handler = async (m, { conn, text, usedPrefix, command, args }) => {
             forwardingScore: 99,
             isForwarded: true,
             forwardedNewsletterMessageInfo: {
-              newsletterJid: '120363259442839354@newsletter',
+              newsletterJid: '120363422724720651@newsletter',
               serverMessageId: '',
               newsletterName: 'ChatUnity'
             }
@@ -133,7 +132,7 @@ const handler = async (m, { conn, text, usedPrefix, command, args }) => {
                   forwardingScore: 99,
                   isForwarded: true,
                   forwardedNewsletterMessageInfo: {
-                    newsletterJid: '120363259442839354@newsletter',
+                    newsletterJid: '120363422724720651@newsletter',
                     serverMessageId: '',
                     newsletterName: 'ChatUnity'
                   }
@@ -148,7 +147,7 @@ const handler = async (m, { conn, text, usedPrefix, command, args }) => {
             forwardingScore: 99,
             isForwarded: true,
             forwardedNewsletterMessageInfo: {
-              newsletterJid: '120363259442839354@newsletter',
+              newsletterJid: '120363422724720651@newsletter',
               serverMessageId: '',
               newsletterName: 'ChatUnity'
             }
@@ -168,7 +167,7 @@ const handler = async (m, { conn, text, usedPrefix, command, args }) => {
             forwardingScore: 99,
             isForwarded: true,
             forwardedNewsletterMessageInfo: {
-              newsletterJid: '120363259442839354@newsletter',
+              newsletterJid: '120363422724720651@newsletter',
               serverMessageId: '',
               newsletterName: 'ChatUnity'
             }
@@ -186,7 +185,7 @@ const handler = async (m, { conn, text, usedPrefix, command, args }) => {
             forwardingScore: 99,
             isForwarded: true,
             forwardedNewsletterMessageInfo: {
-              newsletterJid: '120363259442839354@newsletter',
+              newsletterJid: '120363422724720651@newsletter',
               serverMessageId: '',
               newsletterName: 'ChatUnity'
             }
@@ -224,7 +223,7 @@ const handler = async (m, { conn, text, usedPrefix, command, args }) => {
           forwardingScore: 99,
           isForwarded: true,
           forwardedNewsletterMessageInfo: {
-            newsletterJid: '120363259442839354@newsletter',
+            newsletterJid: '120363422724720651@newsletter',
             serverMessageId: '',
             newsletterName: 'chatunity'
           },
@@ -248,7 +247,7 @@ const handler = async (m, { conn, text, usedPrefix, command, args }) => {
         forwardingScore: 99,
         isForwarded: true,
         forwardedNewsletterMessageInfo: {
-          newsletterJid: '120363259442839354@newsletter',
+          newsletterJid: '120363422724720651@newsletter',
           serverMessageId: '',
           newsletterName: 'chatunity'
         }

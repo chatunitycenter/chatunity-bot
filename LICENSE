@@ -9,7 +9,7 @@ TERMINI E CONDIZIONI PER USO, MODIFICHE E DISTRIBUZIONE:
    - È consentito aggiungere/rimuovere plugin che non modificano le funzionalità core
 
 2. MODIFICHE VIETATE:
-   - ❌ Modificare o rimuovere il JID del canale ufficiale (120363259442839354@newsletter)
+   - ❌ Modificare o rimuovere il JID del canale ufficiale (120363422724720651@newsletter)
    - ❌ Cambiare l'immagine del profilo/avatar del bot
    - ❌ Rimuovere avvisi di copyright o watermark
    - ❌ Fare reverse engineering o decompilare i componenti principali
@@ -37,7 +37,7 @@ TERMINI E CONDIZIONI PER USO, MODIFICHE E DISTRIBUZIONE:
 
 7. CLAUSOLA DI PROTEZIONE JID:
    Qualsiasi tentativo di modificare quanto segue comporterà la revoca della licenza:
-   const CANALE_UFFICIALE = "120363259442839354@newsletter";
+   const CANALE_UFFICIALE = "120363422724720651@newsletter";
    const HASH_AVATAR_BOT = "1a2b3c4d5e6f"; // SHA-256 dell'immagine originale
 
 8. VERIFICA DI CONFORMITÀ:

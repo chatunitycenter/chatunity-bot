@@ -2,12 +2,15 @@ import { performance } from 'perf_hooks';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
+import '../lib/language.js';
 
 // Definizione di __dirname per i moduli ESM
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const handler = async (message, { conn, usedPrefix, command }) => {
+    const userId = message.sender;
+    const groupId = message.isGroup ? message.chat : null;
     const userCount = Object.keys(global.db.data.users).length;
     const botName = global.db.data.nomedelbot || 'ChatUnity';
 
@@ -24,22 +27,22 @@ const handler = async (message, { conn, usedPrefix, command }) => {
         return await (await import('./menu-sicurezza.js')).default(message, { conn, usedPrefix });
     }
 
-    const menuText = generateMenuText(usedPrefix, botName, userCount);
+    const menuText = generateMenuText(usedPrefix, botName, userCount, userId, groupId);
 
-    const imagePath = path.join(__dirname, '../menu/onepiece5.jpeg'); 
+    const imagePath = path.join(__dirname, '../menu/gruppo.jpeg'); 
 
     await conn.sendMessage(
         message.chat,
         {
             image: { url: imagePath },
             caption: menuText,
-            footer: 'Scegli un menu:',
+            footer: global.t('chooseMenu', userId, groupId) || 'Scegli un menu:',
             buttons: [
-                { buttonId: `${usedPrefix}menu`, buttonText: { displayText: "🏠 Menu Principale" }, type: 1 },
-                { buttonId: `${usedPrefix}menuadmin`, buttonText: { displayText: "🛡️ Menu Admin" }, type: 1 },
-                { buttonId: `${usedPrefix}menuowner`, buttonText: { displayText: "👑 Menu Owner" }, type: 1 },
-                { buttonId: `${usedPrefix}menusicurezza`, buttonText: { displayText: "🚨 Menu Sicurezza" }, type: 1 },
-                { buttonId: `${usedPrefix}menuia`, buttonText: { displayText: "🤖 Menu IA" }, type: 1 }
+                { buttonId: `${usedPrefix}menu`, buttonText: { displayText: global.t('mainMenuButton', userId, groupId) || "🏠 Menu Principale" }, type: 1 },
+                { buttonId: `${usedPrefix}menuadmin`, buttonText: { displayText: global.t('adminMenuButton', userId, groupId) || "🛡️ Menu Admin" }, type: 1 },
+                { buttonId: `${usedPrefix}menuowner`, buttonText: { displayText: global.t('ownerMenuButton', userId, groupId) || "👑 Menu Owner" }, type: 1 },
+                { buttonId: `${usedPrefix}menusicurezza`, buttonText: { displayText: global.t('securityMenuButton', userId, groupId) || "🚨 Menu Sicurezza" }, type: 1 },
+                { buttonId: `${usedPrefix}menuia`, buttonText: { displayText: global.t('aiMenuButton', userId, groupId) || "🤖 Menu IA" }, type: 1 }
             ],
             viewOnce: true,
             headerType: 4
@@ -61,33 +64,33 @@ handler.command = /^(gruppo|menugruppo|menu|menuadmin|menuowner|menusicurezza)$/
 
 export default handler;
 
-function generateMenuText(prefix, botName, userCount) {
+function generateMenuText(prefix, botName, userCount, userId, groupId) {
     return `
-╭━〔 *⚡𝑴𝑬𝑵𝑼 𝐆𝐑𝐔𝐏𝐏𝐎⚡* 〕━┈⊷  
+╭━〔 *⚡${global.t('groupMenuTitle', userId, groupId) || '𝑴𝑬𝑵𝑼 𝐆𝐑𝐔𝐏𝐏𝐎'}⚡* 〕━┈⊷  
 ┃◈╭━━━━━━━━━━━━━·๏  
-┃◈┃• *𝑪𝑶𝑴𝑨𝑵𝑫𝑰 𝐏𝐄𝐑 𝐈 𝐌𝐄𝐌𝐁𝐑𝐈*  
+┃◈┃• *${global.t('memberCommands', userId, groupId) || '𝑪𝑶𝑴𝑨𝑵𝑫𝑰 𝑷𝑬𝑹 𝑰 𝑴𝑬𝑴𝑩𝑹𝑰'}*  
 ┃◈╰━━━━━━━━━━━━┈⊷  
 ┃◈  
-┃◈╭─✦ *MUSICA & AUDIO* ✦═╗  
-┃◈┃• 🎵 *.play* (canzone)  
+┃◈╭─✦ *${global.t('musicAudioSection', userId, groupId) || 'MUSICA & AUDIO'}* ✦═╗  
+┃◈┃• 🎵 *.play* (${global.t('songCommand', userId, groupId) || 'canzone'})  
 ┃◈┃• 🎥 *.playlist*   
 ┃◈┃• 🎥 *.ytsearch*  
-┃◈┃• 🎶 *.shazam* (audio)  
-┃◈┃• 🔊 *.tomp3* (video)  
-┃◈┃• 🎤 *.lyrics* (artista-titolo)  
+┃◈┃• 🎶 *.shazam* (${global.t('audioCommand', userId, groupId) || 'audio'})  
+┃◈┃• 🔊 *.tomp3* (${global.t('videoCommand', userId, groupId) || 'video'})  
+┃◈┃• 🎤 *.lyrics* (${global.t('artistTitleCommand', userId, groupId) || 'artista-titolo'})  
 ┃◈╰━━━━━━━━━━━━┈⊷  
 ┃◈  
-┃◈╭✦ *INFORMAZIONI & UTILITÀ* ✦╗  
-┃◈┃• 🌍 *.meteo* (città)  
-┃◈┃• 🕒 *.orario* (città)  
-┃◈┃• 🌐 *.traduci* (testo)  
-┃◈┃• 📊 *.contaparole* (testo)
-┃◈┃• 🆔 *.id* (gruppo)
-┃◈┃• 💻 *.gitclone* (repo)
-┃◈┃• ℹ️ *.info* [@utente]
+┃◈╭✦ *${global.t('infoUtilitySection', userId, groupId) || 'INFORMAZIONI & UTILITÀ'}* ✦╗  
+┃◈┃• 🌍 *.meteo* (${global.t('cityCommand', userId, groupId) || 'città'})  
+┃◈┃• 🕒 *.orario* (${global.t('cityCommand', userId, groupId) || 'città'})  
+┃◈┃• 🌐 *.traduci* (${global.t('textCommand', userId, groupId) || 'testo'})  
+┃◈┃• 📊 *.contaparole* (${global.t('textCommand', userId, groupId) || 'testo'})
+┃◈┃• 🆔 *.id* (${global.t('groupCommand', userId, groupId) || 'gruppo'})
+┃◈┃• 💻 *.gitclone* (${global.t('repoCommand', userId, groupId) || 'repo'})
+┃◈┃• ℹ️ *.info* [@${global.t('userCommand', userId, groupId) || 'utente'}]
 ┃◈┃• 📜 *.regole*
-┃◈┃• 📚 *.wikipedia* (argomento)
-┃◈┃• 🔍 *.checkscam* (check sito)
+┃◈┃• 📚 *.wikipedia* (${global.t('topicCommand', userId, groupId) || 'argomento'})
+┃◈┃• 🔍 *.checkscam* (${global.t('checkSiteCommand', userId, groupId) || 'check sito'})
 ┃◈┃• 📜 *.dashboard*  
 ┃◈┃• 🔍 *.cercaimmagine* 
 ┃◈┃• ❓ *.script*  
@@ -96,18 +99,18 @@ function generateMenuText(prefix, botName, userCount) {
 ┃◈┃• 🗞️ *.notiziario*  
 ┃◈╰━━━━━━━━━━━━┈⊷  
 ┃◈  
-┃◈╭✦ *IMMAGINI & MODIFICA* ✦╗  
-┃◈┃• 🛠️ *.sticker* (foto a sticker)  
-┃◈┃• 🖼️ *.png* (sticker a foto)  
-┃◈┃• 📷 *.hd* (migliora qualità foto)  
-┃◈┃• 🖼️ *.rimuovisfondo* (foto)  
-┃◈┃• 🔍 *.rivela* (foto nascosta
-┃◈┃• 🤕 *.bonk* (meme))  
-┃◈┃• 🖼️ *.toimg* (da sticker)  
-┃◈┃• 📖 *.leggi* (foto)  
-┃◈┃• 🌀 *.blur* (sfoca immagine)  
-┃◈┃• 🖼️ *.pinterest* (in arrivo)  
-┃◈┃• 🎴 *.hornycard* [@utente]  
+┃◈╭✦ *${global.t('imageEditSection', userId, groupId) || 'IMMAGINI & MODIFICA'}* ✦╗  
+┃◈┃• 🛠️ *.sticker* (${global.t('photoToStickerCommand', userId, groupId) || 'foto a sticker'})  
+┃◈┃• 🖼️ *.png* (${global.t('stickerToPhotoCommand', userId, groupId) || 'sticker a foto'})  
+┃◈┃• 📷 *.hd* (${global.t('improveQualityCommand', userId, groupId) || 'migliora qualità foto'})  
+┃◈┃• 🖼️ *.rimuovisfondo* (${global.t('photoCommand', userId, groupId) || 'foto'})  
+┃◈┃• 🔍 *.rivela* (${global.t('hiddenPhotoCommand', userId, groupId) || 'foto nascosta'})
+┃◈┃• 🤕 *.bonk* (${global.t('memeCommand', userId, groupId) || 'meme'}))  
+┃◈┃• 🖼️ *.toimg* (${global.t('fromStickerCommand', userId, groupId) || 'da sticker'})  
+┃◈┃• 📖 *.leggi* (${global.t('photoCommand', userId, groupId) || 'foto'})  
+┃◈┃• 🌀 *.blur* (${global.t('blurImageCommand', userId, groupId) || 'sfoca immagine'})  
+┃◈┃• 🖼️ *.pinterest* (${global.t('comingSoonCommand', userId, groupId) || 'in arrivo'})  
+┃◈┃• 🎴 *.hornycard* [@${global.t('userCommand', userId, groupId) || 'utente'}]  
 ┃◈┃• 🧠 *.stupido/a* @  
 ┃◈┃• 🌀 *.emojimix*  
 ┃◈┃• 🎯 *.wanted*  @
@@ -117,7 +120,7 @@ function generateMenuText(prefix, botName, userCount) {
 ┃◈┃• 📢 *.ads*  @
 ┃◈╰━━━━━━━━━━━━┈⊷  
 ┃◈ 
-┃◈╭✦ *POKEMON* ✦╗     
+┃◈╭✦ *${global.t('pokemonSection', userId, groupId) || 'POKEMON'}* ✦╗     
 ┃◈┃• 🥚 *.apripokemon*
 ┃◈┃• 🛒 *.buypokemon*
 ┃◈┃• 🏆 *.classificapokemon*
@@ -130,7 +133,7 @@ function generateMenuText(prefix, botName, userCount) {
 ┃◈┃• 🔄 *.scambia*
 ┃◈╰━━━━━━━━━━━━┈⊷  
 ┃◈  
-┃◈╭─✦ *GANG SYSTEM* ✦═╗  
+┃◈╭─✦ *${global.t('gangSystemSection', userId, groupId) || 'GANG SYSTEM'}* ✦═╗  
 ┃◈┃• 🥷🏻 *.creagang*  
 ┃◈┃• 🔪 *.infogang*  
 ┃◈┃• ⛓ *.abbandonagang*  
@@ -138,17 +141,19 @@ function generateMenuText(prefix, botName, userCount) {
 ┃◈┃• 🎧 *.caccialogang* @  
 ┃◈╰━━━━━━━━━━━━┈⊷  
 ┃◈  
-┃◈╭─✦ *GIOCHI & CASINÒ* ✦╗  
+┃◈╭─✦ *${global.t('gamesCasinoSection', userId, groupId) || 'GIOCHI & CASINÒ'}* ✦╗  
 ┃◈┃• 🎮 *.tris*  
 ┃◈┃• 🎲 *.dado*  
 ┃◈┃• 🎰 *.slot*  
-┃◈┃• 🃏 *.casinò*  
-┃◈┃• 💰 *.scommessa* (quantità)  
+┃◈┃• 🏏 *.casinò*  
+┃◈┃• 💰 *.scommessa* (${global.t('quantityCommand', userId, groupId) || 'quantità'})  
+┃◈┃• 💰 *.blackjack*
+┃◈┃• 💰 *.wordle*
 ┃◈┃• 🔫 *.roulette*  
-┃◈┃• 🪙 *.moneta* (testa o croce)  
-┃◈┃• 🧮 *.mate* (problema mate)  
-┃◈┃• 📈 *.scf* (sasso carta forbici)  
-┃◈┃• 🐾 *.pokedex* (info Pokémon)  
+┃◈┃• 🪙 *.moneta* (${global.t('headsOrTailsCommand', userId, groupId) || 'testa o croce'})  
+┃◈┃• 🧮 *.mate* (${global.t('mathProblemCommand', userId, groupId) || 'problema mate'})  
+┃◈┃• 📈 *.scf* (${global.t('rockPaperScissorsCommand', userId, groupId) || 'sasso carta forbici'})  
+┃◈┃• 🐾 *.pokedex* (${global.t('pokemonInfoCommand', userId, groupId) || 'info Pokémon'})  
 ┃◈┃• 🏳️ *.bandiera*  
 ┃◈┃• 🎶 *.ic*  
 ┃◈┃• 🤖 *.auto*  
@@ -156,43 +161,40 @@ function generateMenuText(prefix, botName, userCount) {
 ┃◈┃• 🎯 *.missioni*  
 ┃◈╰━━━━━━━━━━━━┈⊷  
 ┃◈  
-┃◈╭✦ *ECONOMIA & CLASSIFICHE* ✦╗  
-┃◈┃• 💰 *.portafoglio* (saldo)  
+┃◈╭✦ *${global.t('economyRankingSection', userId, groupId) || 'ECONOMIA & CLASSIFICHE'}* ✦╗  
+┃◈┃• 💰 *.portafoglio* (${global.t('balanceCommand', userId, groupId) || 'saldo'})  
 ┃◈┃• 🏦 *.banca*   
 ┃◈┃• 💸 *.daily*  
-┃◈┃• 🏆 *.classifica* (top utenti)  
+┃◈┃• 🏆 *.topuser* (${global.t('topUsersCommand', userId, groupId) || 'top utenti'})  
+┃◈┃• 🏆 *.topgruppi*  
 ┃◈┃• 💳 *.donauc*   
-┃◈┃• 🛒 *.compra* (acquista UC)  
-┃◈┃• 🤑 *.ruba* @utente  
-┃◈┃• 📤 *.ritira* (UC dalla banca)  
-┃◈┃• ⛏️ *.mina* (guadagna XP)  
+┃◈┃• 🤑 *.ruba* @${global.t('userCommand', userId, groupId) || 'utente'}  
+┃◈┃• 📤 *.ritira* (${global.t('withdrawUCCommand', userId, groupId) || 'UC dalla banca'})  
+┃◈┃• ⛏️ *.mina* (${global.t('earnXPCommand', userId, groupId) || 'guadagna XP'})  
 ┃◈┃• 📊 *.xp*  
-┃◈┃• ♻️ *.donaxp* @utente  
-┃◈┃• 🎯 *.rubaxp* @utente  
+┃◈┃• ♾️ *.donaxp* @${global.t('userCommand', userId, groupId) || 'utente'}  
+┃◈┃• 🎯 *.rubaxp* @${global.t('userCommand', userId, groupId) || 'utente'}  
 ┃◈╰━━━━━━━━━━━━┈⊷  
 ┃◈  
-┃◈╭✦ *INTERAZIONI SOCIALI* ✦╗  
-┃◈┃• 💍 *.sposami* (proposta)  
-┃◈┃• 💔 *.divorzia* (fine relazione)  
-┃◈┃• 💌 *.amore* @utente (affinità)  
-┃◈┃• 💋 *.bacia* @utente  
-┃◈┃• 😡 *.odio* @utente  
-┃◈┃• 🗣️ *.rizz* @utente (fascino)  
-┃◈┃• 🤫 *.segreto* @utente  
-┃◈┃• ☠️ *.minaccia* @utente  
-┃◈┃• 🔥 *.zizzania* @utente (crea litigi)  
-┃◈┃• 🚫 *.obbligo* (obb o v)  
+┃◈╭✦ *${global.t('socialInteractionSection', userId, groupId) || 'INTERAZIONI SOCIALI'}* ✦╗  
+┃◈┃• 💔 *.divorzia* (${global.t('endRelationshipCommand', userId, groupId) || 'fine relazione'})  
+┃◈┃• 💌 *.amore* @${global.t('userCommand', userId, groupId) || 'utente'} (${global.t('affinityCommand', userId, groupId) || 'affinità'})  
+┃◈┃• 💋 *.bacia* @${global.t('userCommand', userId, groupId) || 'utente'}  
+┃◈┃• 😡 *.odio* @${global.t('userCommand', userId, groupId) || 'utente'}  
+┃◈┃• 🗣️ *.rizz* @${global.t('userCommand', userId, groupId) || 'utente'} (${global.t('charmCommand', userId, groupId) || 'fascino'})  
+┃◈┃• ☠️ *.minaccia* @${global.t('userCommand', userId, groupId) || 'utente'}  
+┃◈┃• 🔥 *.zizzania* @${global.t('userCommand', userId, groupId) || 'utente'} (${global.t('createFightCommand', userId, groupId) || 'crea litigi'})  
+┃◈┃• 🚫 *.obbligo* (${global.t('truthOrDareCommand', userId, groupId) || 'obb o v'})  
 ┃◈┃• 💋 *.ditalino* @  
 ┃◈┃• 💋 *.sega* @  
 ┃◈┃• 💋 *.scopa* @  
 ┃◈┃• 🖕 *.insulta* @  
-┃◈┃• 💍 *.sposa* @  
 ┃◈┃• 👥 *.amicizia/listamici* @  
 ┃◈╰━━━━━━━━━━━━┈⊷  
 ┃◈  
-┃◈╭✦ *QUANTO È?* ✦╗  
-┃◈┃• 🏳‍🌈 *.gay* @  
-┃◈┃• 🏳‍🌈 *.lesbica* @  
+┃◈╭✦ *${global.t('howMuchSection', userId, groupId) || 'QUANTO È?'}* ✦╗  
+┃◈┃• 🏳️‍🌈 *.gay* @  
+┃◈┃• 🏳️‍🌈 *.lesbica* @  
 ┃◈┃• ♿ *.ritardato/a* @  
 ┃◈┃• ♿ *.down* @  
 ┃◈┃• ♿ *.disabile* @  
@@ -201,7 +203,7 @@ function generateMenuText(prefix, botName, userCount) {
 ┃◈┃• 🐓 *.cornuto* @  
 ┃◈╰━━━━━━━━━━━━┈⊷  
 ┃◈  
-┃◈╭✦ *TEST PERSONALITÀ* ✦╗  
+┃◈╭✦ *${global.t('personalityTestSection', userId, groupId) || 'TEST PERSONALITÀ'}* ✦╗  
 ┃◈┃• 🍺 *.alcolizzato*  
 ┃◈┃• 🌿 *.drogato*  
 ┃◈┃• 🍑 *.figa*  
@@ -213,9 +215,9 @@ function generateMenuText(prefix, botName, userCount) {
 ┃◈┃• 🙏 *.topbestemmie*  
 ┃◈╰━━━━━━━━━━━━┈⊷  
 ┃◈ 
-┃◈┃• *𝑽𝑬𝑹𝑺𝑰𝑶𝑵𝑬:* ${vs}  
-┃◈┃• *𝐂𝐎𝐋𝐋𝐀𝐁: �𝐍𝐄 𝐏𝐈���* 
-┃◈┃• *𝐒𝐔𝐏𝐏𝐎𝐑𝐓𝐎:* (.supporto)  
+┃◈┃• *${global.t('versionLabel', userId, groupId) || '𝑵𝑬𝑹𝑺𝑰𝑶𝑵𝑬'}:* ${vs}  
+┃◈┃• *${global.t('collabLabel', userId, groupId) || '𝐂𝐎𝐋𝐋𝐀𝐁: 𝐎𝐍𝐄 𝐏𝐈𝐄𝐂𝐄'}* 
+┃◈┃• *${global.t('supportLabel', userId, groupId) || '𝐒𝐔𝐏𝐏𝐎𝐑𝐓𝐎'}:* (.supporto)  
 ┃◈└──────────┈⊷  
 ╰━━━━━━━━━━━━━┈⊷  
 

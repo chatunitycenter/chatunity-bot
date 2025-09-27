@@ -1,98 +1,88 @@
-//import db from '../lib/database.js'
-let cooldowns = {};
+let cooldowns = {}
 
-let reg = 40
 let handler = async (m, { conn, args, usedPrefix, command }) => {
-    let fa = `.`.trim()
-    let users = global.db.data.users[m.sender]
-    let apuesta = parseInt(args[0])
-
-    // Cooldown di 5 minuti (solo in caso di vincita)
-    if (cooldowns[m.sender] && Date.now() - cooldowns[m.sender] < 5 * 60 * 1000) {
-        let ms = cooldowns[m.sender] + 5 * 60 * 1000 - Date.now();
-        let min = Math.floor(ms / 60000);
-        let sec = Math.floor((ms % 60000) / 1000);
-        let tempoRimanente = `${min}m ${sec}s`
-
-        await conn.sendMessage(
-          m.chat,
-          {
-            text: `⏳ Devi aspettare ${tempoRimanente} prima di poter rigiocare dopo una vincita!`,
-            footer: 'Torna più tardi o scegli un altro comando:',
-            buttons: [
-              { buttonId: `${usedPrefix}menu`, buttonText: { displayText: "🏠 Menu Principale" }, type: 1 }
-            ],
-            viewOnce: true,
-            headerType: 4
-          },
-          { quoted: m }
-        );
-        return;
+    let user = global.db.data.users[m.sender]
+    let bet = args[0] ? parseInt(args[0]) : 20
+    
+    if (isNaN(bet) || bet <= 0) {
+        return conn.reply(m.chat, '❌ Puntata non valida.\nEsempio: *' + usedPrefix + command + ' 100*', m)
     }
 
-    let emojis = ["🪙", "🎰", "💎"];
-    // Estrai 3 simboli casuali
-    let estratti = [];
-    for (let i = 0; i < 3; i++) {
-        estratti.push(emojis[Math.floor(Math.random() * emojis.length)]);
+    if ((user.limit || 0) < bet) {
+        return conn.reply(m.chat, '🚫 UC insufficienti! Ti servono ' + bet + ' UC.', m)
     }
 
-    // Aumenta la probabilità di vincita: 1 su 4 (25%) per tripla uguale
-    let win = false;
-    if (Math.random() < 0.25) {
-        estratti = [emojis[0], emojis[0], emojis[0]]; // tripla vincente
-        win = true;
+    if (cooldowns[m.sender] && Date.now() - cooldowns[m.sender] < 300000) {
+        let timeLeft = cooldowns[m.sender] + 300000 - Date.now()
+        let min = Math.floor(timeLeft / 60000)
+        let sec = Math.floor((timeLeft % 60000) / 1000)
+        return conn.reply(m.chat, '⏳ Aspetta ' + min + 'm ' + sec + 's prima di giocare di nuovo.', m)
     }
 
-    // Ricostruisci la matrice per la visualizzazione
-    let x = [estratti[0], estratti[0], estratti[0]];
-    let y = [estratti[1], estratti[1], estratti[1]];
-    let z = [estratti[2], estratti[2], estratti[2]];
+    let win = Math.random() < 0.5
+    let resultMsg, gifFile
 
-    let end;
-    if (win || (estratti[0] === estratti[1] && estratti[1] === estratti[2])) {
-        end = `𝐡𝐚𝐢 𝐯𝐢𝐧𝐭𝐨 🎉 🎁\nComplimenti, hai vinto 500 unitycoins!`
-        users.exp += apuesta + apuesta
-        users.limit = (users.limit || 0) + 500 // aggiungi 500 unitycoins
-        win = true;
-    } else if (estratti[0] === estratti[1] || estratti[0] === estratti[2] || estratti[1] === estratti[2]) {
-        end = `𝐜𝐨𝐧𝐭𝐢𝐧𝐮𝐚 𝐚 𝐭𝐞𝐧𝐭𝐚𝐫𝐞 . . .`
-    } else {
-        end = `𝐡𝐚𝐢 𝐩𝐞𝐫𝐬𝐨 🤡`
-        users.exp -= apuesta
-    }
+    // Calcola informazioni livello e XP
+    user.exp = Number(user.exp) || 0
+    user.level = Number(user.level) || 1
+    let { min: minXP, xp: levelXP, max: maxXP } = xpRange(user.level, global.multiplier || 1)
+    let currentLevelXP = user.exp - minXP
 
-    // Se ha vinto, imposta il cooldown
     if (win) {
-        cooldowns[m.sender] = Date.now();
+        user.limit = (user.limit || 0) + 800
+        user.exp = (user.exp || 0) + 100
+        resultMsg = '🎉 *Hai vinto!*\n'
+        resultMsg += '┌──────────────\n'
+        resultMsg += '│ ➕ *800 UC*\n'
+        resultMsg += '│ ➕ *100 XP*\n'
+        resultMsg += '└──────────────\n'
+        gifFile = './icone/perdita.gif'  // Cambiato in GIF
+    } else {
+        user.limit = (user.limit || 0) - bet
+        user.exp = Math.max(0, (user.exp || 0) - bet)
+        resultMsg = '🤡 *Hai perso!*\n'
+        resultMsg += '┌──────────────\n'
+        resultMsg += '│ ➖ *' + bet + ' UC*\n'
+        resultMsg += '│ ➖ *' + bet + ' XP*\n'
+        resultMsg += '└──────────────\n'
+        gifFile = './icone/vincita.gif'  // Cambiato in GIF
     }
 
-    let risultatoSlot = `
-       🎰 ┃ 𝐒𝐋𝐎𝐓
-     ──────────
-       ${x[0]} : ${y[0]} : ${z[0]}
-       ${x[1]} : ${y[1]} : ${z[1]}
-       ${x[2]} : ${y[2]} : ${z[2]}
-     ──────────
-        
-${end}`
+    // Aggiungi informazioni saldo attuale
+    resultMsg += '\n💎 *SALDO ATTUALE*\n'
+    resultMsg += '┌──────────────\n'
+    resultMsg += '│ 👛 *UC: ' + (user.limit || 0) + '*\n'
+    resultMsg += '│ ⭐ *XP: ' + (user.exp || 0) + '*\n'
+    resultMsg += '│ 📊 *Progresso: ' + currentLevelXP + '/' + levelXP + ' XP*\n'
+    resultMsg += '└──────────────\n'
+    resultMsg += '\nℹ️ Usa ' + usedPrefix + 'menuxp per guadagnare più XP!'
 
-    await conn.sendMessage(
-      m.chat,
-      {
-        text: risultatoSlot, // o caption se usi video/foto
-        footer: 'Vuoi giocare ancora?',
-        buttons: [
-          { buttonId: `${usedPrefix}slot`, buttonText: { displayText: "🎰 Gioca ancora" }, type: 1 },
-        ],
-        viewOnce: true,
-        headerType: 4
-      },
-      { quoted: m }
-    );
+    // Invia la GIF invece del video
+    await conn.sendMessage(m.chat, { 
+        video: { url: gifFile }, 
+        gifPlayback: true 
+    }, { quoted: m })
+
+    cooldowns[m.sender] = Date.now()
+    
+    // Aspetta 3 secondi e manda il risultato
+    await new Promise(resolve => setTimeout(resolve, 3000))
+    await conn.reply(m.chat, resultMsg, m)
 }
-handler.help = ['slot <apuesta>']
+
+handler.help = ['slot <puntata>']
 handler.tags = ['game']
 handler.command = ['slot']
 
 export default handler
+
+// Funzione xpRange dal tuo codice di esempio
+function xpRange(level, multiplier = 1) {
+    if(level < 0) level = 0
+    let min = level === 0 ? 0 : Math.pow(level, 2) * 20
+    let max = Math.pow(level + 1, 2) * 20
+    let xp = Math.floor((max - min) * multiplier)
+    return { min, xp, max }
+}
+
+

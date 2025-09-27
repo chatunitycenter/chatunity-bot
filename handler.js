@@ -1,4 +1,3 @@
-import { generateWAMessageFromContent } from '@whiskeysockets/baileys'
 import { smsg } from './lib/simple.js'
 import { format } from 'util'
 import { fileURLToPath } from 'url'
@@ -6,28 +5,16 @@ import path, { join } from 'path'
 import { unwatchFile, watchFile } from 'fs'
 import fs from 'fs'
 import chalk from 'chalk'
-
-/**
- * @type {import('@whiskeysockets/baileys')}
- */
-const { proto } = (await import('@whiskeysockets/baileys')).default
+const { proto } = (await import('@realvare/based')).default
 const isNumber = x => typeof x === 'number' && !isNaN(x)
 const delay = ms => isNumber(ms) && new Promise(resolve => setTimeout(function () {
     clearTimeout(this)
     resolve()
 }, ms))
-
-// Inizializzazione sistema anti-spam globale
 global.ignoredUsersGlobal = global.ignoredUsersGlobal || new Set()
 global.ignoredUsersGroup = global.ignoredUsersGroup || {}
 global.groupSpam = global.groupSpam || {}
-
-/**
- * Handle messages upsert
- * @param {import('@whiskeysockets/baileys').BaileysEventMap<unknown>['messages.upsert']} groupsUpdate 
- */
 export async function handler(chatUpdate) {
-    // Inizializzazione sicura delle stats
     if (!global.db.data.stats) global.db.data.stats = {}
     const stats = global.db.data.stats
 
@@ -37,11 +24,9 @@ export async function handler(chatUpdate) {
     let m = chatUpdate.messages[chatUpdate.messages.length - 1]
     if (!m) return
     if (global.db.data == null) await global.loadDatabase()
-
-    // Funzione per verificare se è un owner
     const isOwner = (() => {
         try {
-            const isROwner = [conn.decodeJid(global.conn.user.id), ...global.owner.map(([number]) => number)]
+            const isROwner = [conn.decodeJid(global.conn.user.id), ...global.owner.map(([number]) => number)] // cosi si fa ㊙️
                 .filter(Boolean)
                 .map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net')
                 .includes(m.sender)
@@ -50,17 +35,11 @@ export async function handler(chatUpdate) {
             return false 
         }
     })()
-
-    // Funzione migliorata per verificare i prefissi
     const hasValidPrefix = (text, prefixes) => {
         if (!text || typeof text !== 'string') return false
-        
-        // Se prefixes è una regex, usa test()
         if (prefixes instanceof RegExp) {
             return prefixes.test(text)
         }
-        
-        // Se prefixes è un array, controlla ogni elemento
         const prefixList = Array.isArray(prefixes) ? prefixes : [prefixes]
         
         return prefixList.some(p => {
@@ -72,43 +51,50 @@ export async function handler(chatUpdate) {
             return false
         })
     }
+if (
+  m.isGroup &&
+  !isOwner &&
+  typeof m.text === 'string' &&
+  hasValidPrefix(m.text, conn.prefix || global.prefix)
+) {
+  const now = Date.now();
+  const chatId = m.chat;
 
-    // Sistema anti-spam comandi avanzato (solo per comandi testuali)
-    if (m.isGroup && !isOwner && typeof m.text === 'string' && hasValidPrefix(m.text, conn.prefix || global.prefix)) {
-        if (!global.groupSpam[m.chat]) {
-            global.groupSpam[m.chat] = {
-                count: 0,
-                firstCommandTimestamp: Date.now(),
-                isSuspended: false
-            }
-        }
+  if (!global.groupSpam[chatId]) {
+    global.groupSpam[chatId] = {
+      count: 0,
+      firstCommandTimestamp: now,
+      isSuspended: false,
+      suspendedUntil: null
+    };
+  }
 
-        const groupData = global.groupSpam[m.chat]
-        const now = Date.now()
+  const groupData = global.groupSpam[chatId];
+  if (groupData.isSuspended) {
+    if (now < groupData.suspendedUntil) return;
+    groupData.isSuspended = false;
+    groupData.count = 0;
+    groupData.firstCommandTimestamp = now;
+    groupData.suspendedUntil = null;
+  }
+  if (now - groupData.firstCommandTimestamp > 60000) {
+    groupData.count = 1;
+    groupData.firstCommandTimestamp = now;
+  } else {
+    groupData.count++;
+  }
+  if (groupData.count > 2) {
+    groupData.isSuspended = true;
+    groupData.suspendedUntil = now + 45000;
 
-        if (groupData.isSuspended) return
+    await conn.sendMessage(chatId, { 
+      text: `『 ⚠ 』 Anti-spam comandi\n\nTroppi comandi in poco tempo!\nAttendi *45 secondi* prima di usare altri comandi.\n\n> sviluppato da sam aka vare`, // github.com/realvare
+      mentions: [m.sender]
+    });
+    return;
+  }
+}
 
-        if (now - groupData.firstCommandTimestamp > 60000) {
-            groupData.count = 1
-            groupData.firstCommandTimestamp = now
-        } else {
-            groupData.count++
-        }
-        
-        if (groupData.count > 2) {
-            groupData.isSuspended = true
-            await this.sendMessage(m.chat, {
-                text: '『 ⚠ 』 Anti-spam comandi\n\nRilevati troppi comandi in un minuto, aspettate 10 secondi prima di riutilizzare i comandi.\n\n> SVILUPPATO DA SAM-VARE',
-                mentions: [m.sender]
-            })
-            setTimeout(() => {
-                groupData.isSuspended = false
-                groupData.count = 0
-                groupData.firstCommandTimestamp = Date.now()
-            }, 10000)
-            return
-        }
-    }
 
     try {
         m = smsg(this, m) || m
@@ -117,7 +103,6 @@ export async function handler(chatUpdate) {
         m.limit = false
         
         try {
-            // Inizializzazione dati utente
             let user = global.db.data.users[m.sender]
             if (typeof user !== 'object') global.db.data.users[m.sender] = {}
             
@@ -128,7 +113,6 @@ export async function handler(chatUpdate) {
                 if (!isNumber(user.money)) user.money = 0 
                 if (!isNumber(user.warn)) user.warn = 0
                 if (!isNumber(user.joincount)) user.joincount = 2   
-                if (!isNumber(user.limit)) user.limit = 20
                 if (!('premium' in user)) user.premium = false
                 if (!isNumber(user.premiumDate)) user.premiumDate = -1
                 if (!('name' in user)) user.name = m.name
@@ -141,7 +125,7 @@ export async function handler(chatUpdate) {
                     money: 0,
                     warn: 0,
                     joincount: 2,
-                    limit: 20,
+                    limit: 15000,
                     premium: false,
                     premiumDate: -1,
                     name: m.name,
@@ -149,7 +133,34 @@ export async function handler(chatUpdate) {
                 }
             }
             
-            // Inizializzazione dati chat
+
+            let handler = async (m, { conn, text }) => {
+    const botName = global.t('default_bot_name', m?.sender) || "ChatUnityBot";
+    let destinatario;
+
+    if (m.quoted && m.quoted.sender) {
+        destinatario = m.quoted.sender;
+    } else if (m.mentionedJid && m.mentionedJid.length > 0) {
+        destinatario = m.mentionedJid[0];
+    } else {
+        return m.reply(global.t('rizz_no_target', m.sender));
+    }
+
+    let chiHaUsato = `@${m.sender.split('@')[0]}`;
+    let chiTaggare = `@${destinatario.split('@')[0]}`;
+
+    m.reply(
+        global.t('rizz_message', m.sender, null, {
+            piropo: pickRandom(global.piropo),
+            sender: chiHaUsato,
+            target: chiTaggare
+        }),
+        null,
+        {
+            mentions: [destinatario]
+        }
+    );
+}
             let chat = global.db.data.chats[m.chat]
             if (typeof chat !== 'object') global.db.data.chats[m.chat] = {}
             
@@ -163,6 +174,7 @@ export async function handler(chatUpdate) {
                 if (!isNumber(chat.messaggi)) chat.messaggi = 0
                 if (!('name' in chat)) chat.name = this.getName(m.chat)
                 if (!('antispamcomandi' in chat)) chat.antispamcomandi = true
+                if (!('welcome' in chat)) chat.welcome = true
             } else {
                 global.db.data.chats[m.chat] = {
                     name: this.getName(m.chat),
@@ -173,11 +185,10 @@ export async function handler(chatUpdate) {
                     antiTraba: true,
                     expired: 0,
                     messaggi: 0,
-                    antispamcomandi: true
+                    antispamcomandi: true,
+                    welcome: true
                 }
             }
-            
-            // Inizializzazione settings
             let settings = global.db.data.settings[this.user.jid]
             if (typeof settings !== 'object') global.db.data.settings[this.user.jid] = {}
             
@@ -229,13 +240,35 @@ export async function handler(chatUpdate) {
 
         const groupMetadata = (m.isGroup ? ((conn.chats[m.chat] || {}).metadata || await this.groupMetadata(m.chat).catch(_ => null)) : {}) || {}
         const participants = (m.isGroup ? groupMetadata.participants : []) || []
-        const user = (m.isGroup ? participants.find(u => conn.decodeJid(u.id) === m.sender) : {}) || {}
-        const bot = (m.isGroup ? participants.find(u => conn.decodeJid(u.id) == this.user.jid) : {}) || {}
-        const isRAdmin = user?.admin == 'superadmin' || false
-        const isAdmin = isRAdmin || user?.admin == 'admin' || false
-        const isBotAdmin = bot?.admin || false
+        const normalizedParticipants = participants.map(u => {
+            const normalizedId = this.decodeJid(u.id);
+            return { ...u, id: normalizedId, jid: u.jid || normalizedId };
+        });
+        const user = (m.isGroup ? normalizedParticipants.find(u => conn.decodeJid(u.id) === m.sender) : {}) || {}
+        const bot = (m.isGroup ? normalizedParticipants.find(u => conn.decodeJid(u.id) == this.user.jid) : {}) || {}
 
-        // Gestione plugin
+        // --- INIZIO PATCH RUOLI ADMIN ---
+      //credit to vare
+        async function isUserAdmin(conn, chatId, senderId) {
+            try {
+                const decodedSender = conn.decodeJid(senderId);
+                const groupMeta = groupMetadata;
+                return groupMeta?.participants?.some(p =>
+                    (conn.decodeJid(p.id) === decodedSender || p.jid === decodedSender) &&
+                    (p.admin === 'admin' || p.admin === 'superadmin')
+                ) || false;
+            } catch {
+                return false;
+            }
+        }
+        // --- FINE PATCH RUOLI ADMIN ---
+
+
+        const isRAdmin = user?.admin == 'superadmin' || false
+        const isAdmin = m.isGroup ? await isUserAdmin(this, m.chat, m.sender) : false
+        const isBotAdmin = m.isGroup ? await isUserAdmin(this, m.chat, this.user.jid) : false
+
+
         const ___dirname = path.join(path.dirname(fileURLToPath(import.meta.url)), './plugins')
         for (let name in global.plugins) {
             let plugin = global.plugins[name]
@@ -274,6 +307,7 @@ export async function handler(chatUpdate) {
                 if (await plugin.before.call(this, m, {
                     match,
                     conn: this,
+                    normalizedParticipants,
                     participants,
                     groupMetadata,
                     user,
@@ -373,7 +407,6 @@ export async function handler(chatUpdate) {
                 m.exp += xp
 
                 if (!isPrems && plugin.limit && global.db.data.users[m.sender]?.limit < plugin.limit * 1) {
-                    this.reply(m.chat, `diamanti terminati`, m)
                     continue
                 }
                 if (plugin.level > _user?.level) {
@@ -390,6 +423,7 @@ export async function handler(chatUpdate) {
                     command,
                     text,
                     conn: this,
+                    normalizedParticipants,
                     participants,
                     groupMetadata,
                     user,
@@ -427,9 +461,9 @@ export async function handler(chatUpdate) {
                         } catch (e) {
                             console.error(e)
                         }
-                        if (m.money) m.reply(+m.money + ' 𝙂𝘼𝙏𝘼𝘾𝙊𝙄𝙉𝙎 🐱 𝙐𝙎𝘼𝘿𝙊(𝙎)') 
+
                     }
-                    if (m.limit) m.reply(+m.limit + ' diamante usato')
+
                 }
                 break
             }
@@ -437,7 +471,6 @@ export async function handler(chatUpdate) {
     } catch (e) {
         console.error(e)
     } finally {
-        // Pulizia e aggiornamento dati
         if (opts['queque'] && m.text) {
             const quequeIndex = this.msgqueque.indexOf(m.id || m.key.id)
             if (quequeIndex !== -1) this.msgqueque.splice(quequeIndex, 1)
@@ -446,8 +479,6 @@ export async function handler(chatUpdate) {
         if (m?.sender) {
             let user = global.db.data.users[m.sender]
             let chat = global.db.data.chats[m.chat]
-            
-            // Gestione utenti mutati
             if (user?.muto) {
                 await conn.sendMessage(m.chat, {
                     delete: {
@@ -458,8 +489,6 @@ export async function handler(chatUpdate) {
                     }
                 })
             }
-            
-            // Aggiornamento statistiche utente/chat
             if (user) {
                 user.exp += m.exp
                 user.limit -= m.limit * 1
@@ -468,8 +497,6 @@ export async function handler(chatUpdate) {
             }
             if (chat) chat.messaggi += 1
         }
-
-        // Tracciamento statistiche plugin
         if (m?.plugin) {
             let now = +new Date
             if (!stats[m.plugin]) {
@@ -503,6 +530,47 @@ export async function participantsUpdate({ id, participants, action }) {
     if (this.isInit) return
     if (global.db.data == null) await loadDatabase()
     let chat = global.db.data.chats[id] || {}
+
+    // --- Benvenuto/Addio ---
+    if (chat.welcome) {
+        let groupMetadata = await this.groupMetadata(id).catch(_ => null) || (this.chats[id] || {}).metadata
+        for (let user of participants) {
+            let pp = './menu/principale.jpeg'
+            try {
+                pp = await this.profilePictureUrl(user, 'image')
+            } catch (e) {}
+            let apii
+            try {
+                apii = await this.getFile(pp)
+            } catch (e) {
+                apii = { data: fs.readFileSync('./menu/principale.jpeg') }
+            }
+            let nomeDelBot = global.db.data.nomedelbot || `𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲-𝐁𝐨𝐭`
+            let text = (action === 'add'
+                ? (chat.sWelcome || this.welcome || this.conn?.welcome || 'Benvenuto, @user!').replace('@subject', groupMetadata?.subject || '').replace('@desc', groupMetadata?.desc?.toString() || 'bot')
+                : (chat.sBye || this.bye || this.conn?.bye || 'Addio, @user!')).replace('@user', '@' + user.split('@')[0])
+            await this.sendMessage(id, {
+                text: text,
+                contextInfo: {
+                    mentionedJid: [user],
+                    forwardingScore: 99,
+                    isForwarded: true,
+                    forwardedNewsletterMessageInfo: {
+                        newsletterJid: '120363422724720651@newsletter',
+                        serverMessageId: '',
+                        newsletterName: `${nomeDelBot}`
+                    },
+                    externalAdReply: {
+                        "title": `${action === 'add' ? '𝐌𝐞𝐬𝐬𝐚𝐠𝐠𝐢𝐨 𝐝𝐢 𝐛𝐞𝐧𝐯𝐞𝐧𝐮𝐭𝐨' : '𝐌𝐞𝐬𝐬𝐚𝐠𝐠𝐢𝐨 𝐝𝐢 𝐚𝐝𝐝𝐢𝐨'}`,
+                        "previewType": "PHOTO",
+                        "thumbnailUrl": ``,
+                        "thumbnail": apii.data,
+                        "mediaType": 1
+                    }
+                }
+            })
+        }
+    }
 }
 
 export async function groupsUpdate(groupsUpdate) {
@@ -511,8 +579,8 @@ export async function groupsUpdate(groupsUpdate) {
         const id = groupUpdate.id
         if (!id) continue
         let chats = global.db.data.chats[id], text = ''
-        if (groupUpdate.icon) text = (chats.sIcon || this.sIcon || conn.sIcon || '```immagine modificata```').replace('@icon', groupUpdate.icon)
-        if (groupUpdate.revoke) text = (chats.sRevoke || this.sRevoke || conn.sRevoke || '```link reimpostato, nuovo link:```\n@revoke').replace('@revoke', groupUpdate.revoke)
+        if (groupUpdate.icon) text = (chats.sIcon || this.sIcon || conn.sIcon || '`immagine modificata`').replace('@icon', groupUpdate.icon)
+        if (groupUpdate.revoke) text = (chats.sRevoke || this.sRevoke || conn.sRevoke || '`link reimpostato, nuovo link:`\n@revoke').replace('@revoke', groupUpdate.revoke)
         if (!text) continue
         await this.sendMessage(id, { text, mentions: this.parseMention(text) })
     }
@@ -525,7 +593,7 @@ export async function callUpdate(callUpdate) {
         if (nk.isGroup == false) {
             if (nk.status == "offer") {
                 let callmsg = await this.reply(nk.from, `ciao @${nk.from.split('@')[0]}, c'è anticall.`, false, { mentions: [nk.from] })
-                let vcard = `BEGIN:VCARD\nVERSION:5.0\nN:;𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲;;;\nFN:𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲\nORG:𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲\nTITLE:\nitem1.TEL;waid=393515533859:+39 3515533859\nitem1.X-ABLabel:𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲\nX-WA-BIZ-DESCRIPTION:ofc\nX-WA-BIZ-NAME:𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲\nEND:VCARD`
+                let vcard = `BEGIN:VCARD\nVERSION:5.0\nN:;𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲;;;\nFN:𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲\nORG:𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲\nTITLE:\nitem1.TEL;waid=393773842461:+39 3515533859\nitem1.X-ABLabel:𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲\nX-WA-BIZ-DESCRIPTION:ofc\nX-WA-BIZ-NAME:𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲\nEND:VCARD`
                 await this.sendMessage(nk.from, { contacts: { displayName: 'Unlimited', contacts: [{ vcard }] }}, {quoted: callmsg})
                 await this.updateBlockStatus(nk.from, 'block')
             }
@@ -551,7 +619,7 @@ global.dfail = (type, m, conn) => {
         mods: '𝐐𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨 𝐥𝐨 𝐩𝐨𝐬𝐬𝐨𝐧𝐨 𝐮𝐭𝐢𝐥𝐢𝐳𝐳𝐚𝐫𝐞 𝐬𝐨𝐥𝐨 𝐚𝐝𝐦𝐢𝐧 𝐞 𝐨𝐰𝐧𝐞𝐫 ⚙️',
         premium: '𝐐𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨 𝐞̀ 𝐩𝐞𝐫 𝐦𝐞𝐦𝐛𝐫𝐢 𝐩𝐫𝐞𝐦𝐢𝐮𝐦 ✅',
         group: '𝐐𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨 𝐩𝐮𝐨𝐢 𝐮𝐭𝐢𝐥𝐢𝐳𝐳𝐚𝐫𝐥𝐨 𝐢𝐧 𝐮𝐧 𝐠𝐫𝐮𝐩𝐩𝐨 👥',
-        private: '𝐐𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨 𝐩𝐮𝐨𝐢 𝐮𝐭𝐢𝐥𝐢𝐳𝐳𝐚𝐫𝐥𝐨 𝐢𝐧 𝐜𝐡𝐚𝐭 𝐩𝐫𝐢𝐯𝐚𝐭𝐚 👤',
+        private: '𝐐𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨 𝐩𝐮𝐨𝐢 𝐮𝐭𝐢𝐥𝐢𝐧𝐢𝐭𝐚𝐫𝐥𝐨 𝐢𝐧 𝐜𝐡𝐚𝐭 𝐩𝐫𝐢𝐯𝐚𝐭𝐚 👤',
         admin: '𝐐𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨 𝐞̀ 𝐩𝐞𝐫 𝐬𝐨𝐥𝐢 𝐚𝐝𝐦𝐢𝐧 👑',
         botAdmin: '𝐃𝐞𝐯𝐢 𝐝𝐚𝐫𝐞 𝐚𝐝𝐦𝐢𝐧 𝐚𝐥 𝐛𝐨𝐭 👑',
         restrict: '🔐 𝐑𝐞𝐬𝐭𝐫𝐢𝐜𝐭 𝐞 𝐝𝐢𝐬𝐚𝐭𝐭𝐢𝐯𝐚𝐭𝐨 🔐'
@@ -563,7 +631,7 @@ global.dfail = (type, m, conn) => {
                 "title": `${msg}`, 
                 "body": ``, 
                 "previewType": "PHOTO",
-                "thumbnail": fs.readFileSync('./accessdenied2.png'),
+                "thumbnail": fs.readFileSync('./icone/accessdenied2.png'),
                 "mediaType": 1,
                 "renderLargerThumbnail": true
             }

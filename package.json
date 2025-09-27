@@ -17,25 +17,23 @@
     "eslintfix": "eslint --fix .",
     "localize": "node scripts/localize-plugins.js"
   },
-  "homepage": "https://github.com/chatunitycenter/chatunity-bot-4",
+  "homepage": "https://github.com/chatunitycenter/chatunity-bot",
   "author": {
     "name": "chatunity"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chatunitycenter/chatunity-bot-4.git"
+    "url": "git+https://github.com/chatunitycenter/chatunity-bot.git"
   },
   "bugs": {
-    "url": "https://github.com/chatunitycenter/chatunity-bot-4/issues"
+    "url": "https://github.com/chatunitycenter/chatunity-bot/issues"
   },
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "@bochilteam/scraper": "^5.0.1",
-    "@brandond/findthelyrics": "^2.0.5",
     "@vitalets/google-translate-api": "^8.0.0",
-    "@whiskeysockets/baileys": "github:itsukichann/Baileys",
+    "@realvare/based": "latest" ,
     "acrcloud": "^1.4.0",
-    "aptoide-scraper": "^1.0.1",
     "archiver": "^7.0.1",
     "awesome-phonenumber": "^3.4.0",
     "axios": "^1.7.9",
@@ -44,8 +42,6 @@
     "chalk": "^5.4.1",
     "cheerio": "1.0.0-rc.12",
     "colors": "^1.4.0",
-    "countries-and-timezones": "^3.6.0",
-    "country-phone-prefix": "^1.0.1",
     "file_size_url": "^1.0.4",
     "file-type": "^17.1.1",
     "fluent-ffmpeg": "^2.1.2",
@@ -58,6 +54,7 @@
     "lodash": "^4.17.21",
     "lowdb": "^3.0.0",
     "moment-timezone": "^0.5.34",
+    "mongodb": "^6.3.0",
     "mongoose": "^6.3.3",
     "node-cache": "^5.1.2",
     "node-fetch": "^3.2.0",

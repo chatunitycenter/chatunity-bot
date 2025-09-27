@@ -1,6 +1,6 @@
 import fetch from 'node-fetch'
 import FormData from 'form-data'
-import { downloadContentFromMessage } from '@whiskeysockets/baileys'
+import { downloadContentFromMessage } from '@realvare/based'
 
 // Regex migliorato per link WhatsApp (gruppi/canali), anche con spazi invisibili o caratteri . sparsi
 const linkRegex = /\bchat[\s.\u200B\u200C\u200D\uFEFF]*whatsapp[\s.\u200B\u200C\u200D\uFEFF]*com\/([0-9A-Za-z]{20,24})/i

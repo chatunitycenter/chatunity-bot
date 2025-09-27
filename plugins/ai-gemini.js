@@ -1,35 +1,71 @@
-// Questo comando è stato creato da youns sotto proposta di Google Traduttore
 import fetch from 'node-fetch';
+const API_KEYS = [
+  "AIzaSyCN_QgBqTUI_-J12F7MfbQKKShxeEFNT74",
+  "AIzaSyCkg49KxG7MX-HOQNlNIoS9p9fo5e2mtVU"
+];
 
-var handler = async (m, { text, usedPrefix, command }) => {
-    if (!text) {
-        await m.reply("Che vuoi?");
-        return;
-    }
-
+async function queryGemini(prompt) {
+  for (let i = 0; i < API_KEYS.length; i++) {
+    const key = API_KEYS[i];
     try {
-        conn.sendPresenceUpdate('composing', m.chat);
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000); 
 
-        let prompt = `sei gemini e questa è la mia richiesta "${text}"`;
-
-        var apii = await fetch(`https://apis-starlights-team.koyeb.app/starlight/gemini?text=${encodeURIComponent(prompt)}`);
-        var res = await apii.json();
-
-        if (res && res.result) {
-            await m.reply(res.result);
-        } else {
-            await m.reply("Non ho ricevuto una risposta valida dall'API. Riprova più tardi.");
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }]
+          }),
+          signal: controller.signal
         }
-    } catch (e) {
-        await conn.reply(
-            m.chat,
-            `Si è verificato un errore. Per favore, riprova più tardi.\n\n#report ${usedPrefix + command}\n\n${wm}`,
-            m
-        );
-        console.error(`Errore nel comando ${usedPrefix + command}:`, e);
+      );
+
+      clearTimeout(timeout);
+
+      const data = await response.json();
+      console.log(`🌟 Risposta API chiave ${i + 1}:`, JSON.stringify(data, null, 2));
+
+      const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (reply) return reply; // ✅ se funziona, ritorna subito
+
+    } catch (err) {
+      console.warn(`❌ Chiave API ${i + 1} fallita, provo la prossima...`, err);
+      continue; // prova la prossima chiave
     }
+  }
+
+  // Se tutte le chiavi falliscono
+  return "Non ho ricevuto una risposta valida da nessuna chiave API.";
+}
+
+// Handler principale
+var handler = async (m, { text, usedPrefix, command }) => {
+  if (!text) {
+    await m.reply("Che vuoi?");
+    return;
+  }
+
+  try {
+    conn.sendPresenceUpdate('composing', m.chat);
+
+    const prompt = `sei gemini e questa è la mia richiesta "${text}"`;
+    const geminiReply = await queryGemini(prompt);
+    await m.reply(geminiReply);
+
+  } catch (e) {
+    await conn.reply(
+      m.chat,
+      `Si è verificato un errore inatteso. Riprova più tardi.\n\n#report ${usedPrefix + command}`,
+      m
+    );
+    console.error("Errore nel comando " + usedPrefix + command + ":", e);
+  }
 };
 
+// Comandi e descrizione
 handler.command = ['gemini'];
 handler.help = ['bot <testo>', 'ia <testo>'];
 handler.tags = ['tools'];

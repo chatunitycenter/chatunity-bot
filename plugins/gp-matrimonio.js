@@ -32,7 +32,7 @@ const handleSposa = async (m, user, users, text, usedPrefix, conn) => {
         m.reply(testo, null, { mentions: [mention] });
         return;
     }
-    if (proposals[m.sender] || proposals[mention]) throw "𝐔𝐧𝐚 𝐩𝐫𝐨𝐩𝐨𝐬𝐭𝐚 𝐝𝐢 𝐦𝐚𝐭𝐫𝐢𝐦𝐨𝐧𝐢𝐨 è 𝐠𝐢à 𝐢𝐧 𝐜𝐨𝐫𝐬𝐨. 𝐀𝐭𝐭𝐞𝐧𝐝𝐢 𝐥𝐚 𝐫𝐢𝐬𝐩𝐨𝐬𝐭𝐚 𝐨 𝐥'𝐚𝐧𝐧𝐮𝐥𝐥𝐚𝐦𝐞𝐧𝐭𝐨.";
+    if (proposals[m.sender] || proposals[mention]) throw `𝐔𝐧𝐚 𝐩𝐫𝐨𝐩𝐨𝐬𝐭𝐚 𝐝𝐢 𝐦𝐚𝐭𝐫𝐢𝐦𝐨𝐧𝐢𝐨 è 𝐠𝐢à 𝐢𝐧 𝐜𝐨𝐫𝐬𝐨. 𝐀𝐭𝐭𝐞𝐧𝐝𝐢 𝐥𝐚 𝐫𝐢𝐬𝐩𝐨𝐬𝐭𝐚 𝐨 𝐥'𝐚𝐧𝐧𝐮𝐥𝐥𝐚𝐦𝐞𝐧𝐭𝐨.`;
 
     proposals[mention] = { from: m.sender, timeout: null };
     proposals[m.sender] = { to: mention, timeout: null };

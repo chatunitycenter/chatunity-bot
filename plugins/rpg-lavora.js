@@ -1,62 +1,36 @@
+import fs from 'fs/promises'
+import path from 'path'
+
+const dbPath = path.resolve('./xp-counter.json')
 let cooldowns = {}
 
-let handler = async (m, { conn, isPrems }) => {
-  let user = global.db.data.users[m.sender]
-  let cooldownTime = 5 * 60 // 5 minuti di cooldown
-  
-  // Controllo cooldown
-  if (cooldowns[m.sender] && Date.now() - cooldowns[m.sender] < cooldownTime * 1000) {
-    let remainingTime = formatTime(Math.ceil((cooldowns[m.sender] + cooldownTime * 1000 - Date.now()) / 1000));
-    let message = `⏳ 𝚊𝚜𝚙𝚎𝚝𝚝𝚊 *${remainingTime}* 𝚙𝚛𝚒𝚖𝚊 𝚍𝚒 𝚕𝚊𝚟𝚘𝚛𝚊𝚛𝚎 𝚏𝚊𝚝𝚊 𝚊𝚗𝚌𝚘𝚛𝚊`
-    await conn.sendMessage(m.chat, { 
-        text: message,
-        contextInfo: {
-            forwardingScore: 99,
-            isForwarded: true,
-            forwardedNewsletterMessageInfo: {
-                newsletterJid: '120363259442839354@newsletter',
-                serverMessageId: '',
-                newsletterName: 'ChatUnity'
-            }
-        }
-    }, { quoted: m });
-    return;
+// Funzioni di gestione DB
+async function readDB() {
+  try {
+    const data = await fs.readFile(dbPath, 'utf-8')
+    return JSON.parse(data)
+  } catch (e) {
+    if (e.code === 'ENOENT') {
+      await fs.writeFile(dbPath, '{}', 'utf-8')
+      return {}
+    } else throw e
   }
+}
 
-  // Genera ricompensa casuale
-  let reward = Math.floor(Math.random() * 5000)
-  cooldowns[m.sender] = Date.now()
-  
-  // Assegna XP e invia messaggio
-  user.exp += reward
-  let rewardMessage = `💼 ${pickRandom(jobs)} *${formatNumber(reward)}* ( *${reward}* ) XP 💫`;
-  await conn.sendMessage(m.chat, { 
-      text: rewardMessage,
-      contextInfo: {
-          forwardingScore: 99,
-          isForwarded: true,
-          forwardedNewsletterMessageInfo: {
-              newsletterJid: '120363259442839354@newsletter',
-              serverMessageId: '',
-              newsletterName: 'ChatUnity'
-          }
-      }
-  }, { quoted: m });
+async function writeDB(db) {
+  await fs.writeFile(dbPath, JSON.stringify(db, null, 2), 'utf-8')
 }
 
 // Funzioni di utilità
 function formatNumber(num) {
-  if (num >= 1000 && num < 1000000) {
-    return (num / 1000).toFixed(1) + 'k'
-  } else if (num >= 1000000) {
-    return (num / 1000000).toFixed(1) + 'M'
-  }
+  if (num >= 1000 && num < 1000000) return (num / 1000).toFixed(1) + 'k'
+  if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M'
   return num.toString()
 }
 
 function formatTime(seconds) {
-  let minutes = Math.floor((seconds % 3600) / 60)
-  let remainingSeconds = seconds % 60
+  const minutes = Math.floor((seconds % 3600) / 60)
+  const remainingSeconds = seconds % 60
   return `${minutes} minuti e ${remainingSeconds} secondi`
 }
 
@@ -64,7 +38,7 @@ function pickRandom(list) {
   return list[Math.floor(Math.random() * list.length)]
 }
 
-// Lista lavori tradotta
+// Lista lavori
 const jobs = [
   "Hai lavorato in una fabbrica di biscotti e guadagni",
   "Lavori per un'azienda militare privata e ottieni",
@@ -100,9 +74,40 @@ const jobs = [
   "Ripari slot machine e ricevi"
 ]
 
+let handler = async (m, { conn }) => {
+  const db = await readDB()
+  if (!db[m.sender]) db[m.sender] = { exp: 0 }
+
+  let user = db[m.sender]
+  const cooldownTime = 5 * 60 * 1000 // 5 minuti
+
+  if (cooldowns[m.sender] && Date.now() - cooldowns[m.sender] < cooldownTime) {
+    let remainingTime = formatTime(Math.ceil((cooldowns[m.sender] + cooldownTime - Date.now()) / 1000))
+    const nome = await conn.getName(m.sender)
+    await conn.sendMessage(m.chat, {
+      text: `⏳ ${nome}, aspetta ancora *${remainingTime}* prima di lavorare di nuovo.`,
+      contextInfo: { forwardingScore: 99, isForwarded: true }
+    }, { quoted: m })
+    return
+  }
+
+  const reward = Math.floor(Math.random() * 5000)
+  user.exp += reward
+  cooldowns[m.sender] = Date.now()
+
+  const nome = await conn.getName(m.sender)
+  const jobMessage = `${pickRandom(jobs)} *${formatNumber(reward)} XP* 💫\nNuovo totale: *${user.exp} XP*`
+
+  await conn.sendMessage(m.chat, {
+    text: `💼 ${nome}, ${jobMessage}`,
+    contextInfo: { forwardingScore: 99, isForwarded: true }
+  }, { quoted: m })
+
+  await writeDB(db)
+}
+
 handler.help = ['lavora']
 handler.tags = ['rpg']
 handler.command = ['lavora', 'lavoro', 'w']
-
-// Esporta il modulo utilizzando la sintassi ES Module
+handler.register = true
 export default handler
