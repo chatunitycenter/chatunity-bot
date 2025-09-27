@@ -5,18 +5,13 @@ let handler = async (m, { conn }) => {
   // vCard primo contatto
   let vcard1 = `BEGIN:VCARD
 VERSION:3.0
-FN: ˙ . ᵗˢᵏ ꒷ . 𝐧𝐞𝐱𝐮𝐬 𖦹˙🪽
-ORG: Davide¹
+FN: vale
+ORG: vale
 TEL;type=CELL;type=VOICE;waid=‪393773842461‬:‪+39 377 384 2461‬
 END:VCARD`
 
-  // vCard secondo contatto
-  let vcard2 = `BEGIN:VCARD
-VERSION:3.0
-FN: ˙ . ᵗˢᵏ ꒷ . Luca 𖦹˙🪽
-ORG: Davide²
-TEL;type=CELL;type=VOICE;waid=393793399399:+39 379 339 9399
-END:VCARD`
+
+  
 
   // primo invio -> entrambi i contatti insieme
   await conn.sendMessage(m.chat, {
@@ -35,7 +30,7 @@ END:VCARD`
       message: {
         interactiveMessage: {
           header: { title: "I miei social" },
-          body: { text: "Puoi cobtattarmi anche qua: 👇" },
+          body: { text: "Puoi contattarmi anche qua: 👇" },
           footer: { text: nomebot },
           nativeFlowMessage: {
             buttons: [
