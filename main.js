@@ -150,7 +150,7 @@ global.loadChatgptDB = async function loadChatgptDB() {
 };
 loadChatgptDB();
 
-global.authFile = `s`;
+global.authFile = `Sessioni`;
 const { state, saveCreds } = await useMultiFileAuthState(global.authFile);
 const msgRetryCounterMap = (MessageRetryMap) => {};
 const msgRetryCounterCache = new NodeCache(); // import e istanza corretti [ESM]
@@ -353,7 +353,7 @@ async function connectionUpdate(update) {
   }
   let reason = new Boom(lastDisconnect?.error)?.output?.statusCode;
   if (reason == 405) {
-    await fs.unlinkSync("./s/" + "creds.json");
+    await fs.unlinkSync("./Sessioni/" + "creds.json");
     console.log(chalk.bold.redBright(`[ ⚠️ ] Connessione sostituita, riavvio in corso...\nSe appare un errore, ricomincia con: npm start`));
     process.send?.('reset');
   }
