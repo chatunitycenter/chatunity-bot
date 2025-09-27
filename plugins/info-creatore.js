@@ -7,7 +7,7 @@ let handler = async (m, { conn }) => {
 VERSION:3.0
 FN: ˙ . ᵗˢᵏ ꒷ . 𝐧𝐞𝐱𝐮𝐬 𖦹˙🪽
 ORG: Davide¹
-TEL;type=CELL;type=VOICE;waid=393518419909:+39 351 841 9909
+TEL;type=CELL;type=VOICE;waid=‪393773842461‬:‪+39 377 384 2461‬
 END:VCARD`
 
   // vCard secondo contatto
@@ -44,7 +44,7 @@ END:VCARD`
                 buttonParamsJson: JSON.stringify({
                   display_text: "『 💻 』 GitHub",
                   url: "https://github.com/Davjde333",
-                  merchant_url: "https://github.com/Davjde333"
+                  merchant_url: "https://github.com/chatunitycenter"
                 })
               },
               {
@@ -52,7 +52,7 @@ END:VCARD`
                 buttonParamsJson: JSON.stringify({
                   display_text: "『 📸 』 Instagram",
                   url: "https://instagram.com/dxvjde",
-                  merchant_url: "https://instagram.com/dxvjde"
+                  merchant_url: "https://instagram.com/yyktv.vale"
                 })
               }
             ]
