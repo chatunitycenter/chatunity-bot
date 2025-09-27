@@ -43,7 +43,7 @@ END:VCARD`
                 name: "cta_url",
                 buttonParamsJson: JSON.stringify({
                   display_text: "『 💻 』 GitHub",
-                  url: "https://github.com/Davjde333",
+                  url: "https://github.com/chatunitycenter",
                   merchant_url: "https://github.com/chatunitycenter"
                 })
               },
@@ -51,7 +51,7 @@ END:VCARD`
                 name: "cta_url",
                 buttonParamsJson: JSON.stringify({
                   display_text: "『 📸 』 Instagram",
-                  url: "https://instagram.com/dxvjde",
+                  url: "https://instagram.com/yyktv.vale",
                   merchant_url: "https://instagram.com/yyktv.vale"
                 })
               }
