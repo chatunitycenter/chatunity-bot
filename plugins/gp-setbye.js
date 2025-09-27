@@ -6,6 +6,6 @@ m.reply('ok')
 }
 handler.help = ['setbye <text>']
 handler.tags = ['group']
-handler.command = ['setbye'] 
+handler.command = ['setbye', 'setaddio'] 
 handler.admin = true
 export default handler
