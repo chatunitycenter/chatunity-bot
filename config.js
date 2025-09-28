@@ -15,9 +15,6 @@ global.wait = 'ⓘ 𝐂𝐚𝐫𝐢𝐜𝐚𝐦𝐞𝐧𝐭𝐨 ...';
 
 global.owner = [
   ['393773842461', '𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲', true],
-  ['421233456345', 'Kinderino', true],
-  ['66621409462', 'matte', true],
-  ['393509368693', 'Gab', true],
   ['xxxxxxxxxx',],
   ['xxxxxxxxxx',],
   ['xxxxxxxxxx']
