@@ -19,6 +19,16 @@
 
 ---
 
+## 📥 Installa ZIP
+
+<details>
+  <summary><b>Clicca qui per scaricare</b></summary>
+
+👉🏻 [Scarica ChatUnity-Bot (ZIP)](https://www.mediafire.com/file/la6evdeof2m6pl7/chatunity-bot-main.zip/file)
+
+</details>
+
+---
 ## 📥 Installa Termux & MT Manager
 
 <details>
