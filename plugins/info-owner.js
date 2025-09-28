@@ -1,25 +1,26 @@
-function handler(m) {
-  const contactInfo = {
-    key: { participants: "0@s.whatsapp.net", fromMe: false, id: "Halo" },
-    message: {
-      extendedTextMessage: {
-        text: "𝐎𝐰𝐧𝐞𝐫 𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲",
-        vcard:
-          "BEGIN:VCARD\nVERSION:3.0\nN:;Unlimited;;;\nFN:Unlimited\nORG:Unlimited\nTITLE:\nitem1.TEL;waid=19709001746:+1 (970) 900-1746\nitem1.X-ABLabel:Unlimited\nX-WA-BIZ-DESCRIPTION:ofc\nX-WA-BIZ-NAME:Unlimited\nEND:VCARD"
-      }
-    },
-    participant: "0@s.whatsapp.net"
-  };
-  const contacts = global.main.filter(([jid, number]) => jid && number);
-  this.sendContact(
-    m.chat,
-    contacts.map(([jid, number]) => [jid, number]),
-    contactInfo
-  );
-}
+//Plugin fatto da Gabs & 333 Staff
+let handler = async (m, { conn }) => {
+    const createVCard = (name, number, role) => {
+        return `BEGIN:VCARD
+VERSION:3.0
+FN:${name}
+ORG:ChatUnity;
+TEL;type=CELL;type=VOICE;waid=${number}:+${number}
+X-ABLabel:${role}
+END:VCARD`.replace(/\n/g, '\r\n');
+    };
 
-handler.help = ["owner"];
-handler.tags = ["main"];
-handler.command = ["owner", "creador", "dueño", "fgowner"];
+    await conn.sendMessage(m.chat, { 
+        contacts: { 
+            displayName: 'Creatore', 
+            contacts: [
+                { vcard: createVCard('Creatore', '393509368693', 'Founder') }
+            ]
+        }
+    }, { quoted: m });
+};
 
+handler.help = ['creatore'];
+handler.tags = ['info'];
+handler.command = ['owner', ]; // ✅ Qui la correzione
 export default handler;
