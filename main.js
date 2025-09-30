@@ -23,14 +23,12 @@ import { Low, JSONFile } from 'lowdb';
 import { mongoDB, mongoDBV2 } from './lib/mongoDB.js';
 import store from './lib/store.js';
 import readline from 'readline';
-import NodeCache from 'node-cache'; // ESM
-
+import NodeCache from 'node-cache'; // import ESM corretto
 const { CONNECTING } = ws;
 const { chain } = lodash;
 
 const based = await import('@realvare/based');
 const { proto } = (based.default || based);
-
 const {
   DisconnectReason,
   useMultiFileAuthState,
@@ -43,8 +41,11 @@ const {
 
 // fallback sicuro per PHONENUMBER_MCC
 const PHONENUMBER_MCC = PHONENUMBER_MCC_RAW ?? {};
+
 // helper E.164: 6–15 cifre, no +, prima cifra 1–9
 const isE164Digits = (s) => /^[1-9]\d{5,14}$/.test(s);
+
+// prefissi paese fallback se PHONENUMBER_MCC mancante
 const CC_PREFIXES = [
   '1','7','20','27','30','31','32','33','34','36','39','40','41','43','44','45','46','47','48','49',
   '52','54','55','56','57','58','60','61','62','63','64','65','66','81','82','84','86','90','91','92','93','94','95','98'
@@ -101,7 +102,6 @@ global.prefix = new RegExp('^[' + (opts['prefix'] || '*/i!#$%+£¢€¥^°=¶∆
 
 global.db = new Low(/https?:\/\//.test(opts['db'] || '') ? new cloudDBAdapter(opts['db']) : new JSONFile(`${opts._[0] ? opts._[0] + '_' : ''}database.json`));
 global.DATABASE = global.db;
-
 global.loadDatabase = async function loadDatabase() {
   if (global.db.READ) {
     return new Promise((resolve) => setInterval(async function () {
@@ -162,16 +162,16 @@ const methodCodeQR = process.argv.includes("qr");
 const methodCode = !!phoneNumber || process.argv.includes("code");
 const MethodMobile = process.argv.includes("mobile");
 
+// readline aperta una volta sola, chiusa dopo ultimo input
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 const question = (texto) => new Promise((resolver) => rl.question(texto, resolver));
 let opcion;
 
-// LOGICA SEMPLICE PER INPUT 1/2, UN SOLO TENTATIVO
 if (methodCodeQR) {
   opcion = '1';
 }
 if (!methodCodeQR && !methodCode && !fs.existsSync(`./${authFile}/creds.json`)) {
-  let valid = false
+  let valid = false;
   while (!valid) {
     let lineM = '⋯ ⋯ ⋯ ⋯ ⋯ ⋯ ⋯ ⋯ ⋯ ⋯ ⋯ 》';
     opcion = await question(
@@ -197,10 +197,10 @@ if (!methodCodeQR && !methodCode && !fs.existsSync(`./${authFile}/creds.json`)) 
       process.exit(1);
     }
   }
-  rl.close();
+  // NON chiudere il readline qui
 }
 
-console.info = () => {};
+console.info = () => { };
 
 const connectionOptions = {
   logger: pino({ level: 'silent' }),
@@ -254,7 +254,7 @@ if (!fs.existsSync(`./${authFile}/creds.json`)) {
           if (isE164Digits(numeroTelefono) && hasKnownCC(numeroTelefono)) break;
           console.log(chalk.bgBlack(chalk.bold.redBright(`Inserisci il numero WhatsApp in formato E.164 senza +\nEsempio: +39 333 333 3333 -> 393333333333\n`)));
         }
-        rl.close();
+        rl.close(); // chiuso solo dopo ultimo input
       }
       setTimeout(async () => {
         let codigo = await conn.requestPairingCode(numeroTelefono);
@@ -521,6 +521,7 @@ global.reload = async (_ev, filename) => {
 };
 Object.freeze(global.reload);
 watch(pluginFolder, global.reload);
+
 await global.reloadHandler();
 
 async function _quickTest() {
