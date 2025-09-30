@@ -23,12 +23,14 @@ import { Low, JSONFile } from 'lowdb';
 import { mongoDB, mongoDBV2 } from './lib/mongoDB.js';
 import store from './lib/store.js';
 import readline from 'readline';
-import NodeCache from 'node-cache'; // import ESM corretto
+import NodeCache from 'node-cache'; // ESM
+
 const { CONNECTING } = ws;
 const { chain } = lodash;
 
 const based = await import('@realvare/based');
 const { proto } = (based.default || based);
+
 const {
   DisconnectReason,
   useMultiFileAuthState,
@@ -41,10 +43,8 @@ const {
 
 // fallback sicuro per PHONENUMBER_MCC
 const PHONENUMBER_MCC = PHONENUMBER_MCC_RAW ?? {};
-
 // helper E.164: 6–15 cifre, no +, prima cifra 1–9
-const isE164Digits = (s) => /^[1-9]\d{5,14}$/.test(s); // richiesto da Baileys per pairing
-// prefissi paese fallback se PHONENUMBER_MCC mancante
+const isE164Digits = (s) => /^[1-9]\d{5,14}$/.test(s);
 const CC_PREFIXES = [
   '1','7','20','27','30','31','32','33','34','36','39','40','41','43','44','45','46','47','48','49',
   '52','54','55','56','57','58','60','61','62','63','64','65','66','81','82','84','86','90','91','92','93','94','95','98'
@@ -101,6 +101,7 @@ global.prefix = new RegExp('^[' + (opts['prefix'] || '*/i!#$%+£¢€¥^°=¶∆
 
 global.db = new Low(/https?:\/\//.test(opts['db'] || '') ? new cloudDBAdapter(opts['db']) : new JSONFile(`${opts._[0] ? opts._[0] + '_' : ''}database.json`));
 global.DATABASE = global.db;
+
 global.loadDatabase = async function loadDatabase() {
   if (global.db.READ) {
     return new Promise((resolve) => setInterval(async function () {
@@ -153,7 +154,7 @@ loadChatgptDB();
 global.authFile = `Sessioni`;
 const { state, saveCreds } = await useMultiFileAuthState(global.authFile);
 const msgRetryCounterMap = (MessageRetryMap) => {};
-const msgRetryCounterCache = new NodeCache(); // import e istanza corretti [ESM]
+const msgRetryCounterCache = new NodeCache();
 const { version } = await fetchLatestBaileysVersion();
 let phoneNumber = global.botnumber;
 
@@ -164,13 +165,17 @@ const MethodMobile = process.argv.includes("mobile");
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 const question = (texto) => new Promise((resolver) => rl.question(texto, resolver));
 let opcion;
+
+// LOGICA SEMPLICE PER INPUT 1/2, UN SOLO TENTATIVO
 if (methodCodeQR) {
   opcion = '1';
 }
 if (!methodCodeQR && !methodCode && !fs.existsSync(`./${authFile}/creds.json`)) {
-  do {
+  let valid = false
+  while (!valid) {
     let lineM = '⋯ ⋯ ⋯ ⋯ ⋯ ⋯ ⋯ ⋯ ⋯ ⋯ ⋯ 》';
-    opcion = await question(`╭${lineM}
+    opcion = await question(
+      `╭${lineM}
 ┊ ${chalk.blueBright('╭┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅')}
 ┊ ${chalk.blueBright('┊')} ${chalk.blue.bgBlue.bold.cyan('METODO DI COLLEGAMENTO')}
 ┊ ${chalk.blueBright('╰┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅')}
@@ -183,14 +188,20 @@ if (!methodCodeQR && !methodCode && !fs.existsSync(`./${authFile}/creds.json`)) 
 ┊ ${chalk.blueBright('┊')} ${chalk.bold.redBright(`⇢  Opzione 1:`)} ${chalk.greenBright('Codice qr')}
 ┊ ${chalk.blueBright('┊')} ${chalk.bold.redBright(`⇢  Opzione 2:`)} ${chalk.greenBright('Codice 8 caratteri')}
 ┊ ${chalk.blueBright('╰┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅')}
-╰${lineM}\n${chalk.bold.magentaBright('---> ')}`);
-    if (!/^[1-2]$/.test(opcion)) {
+╰${lineM}\n${chalk.bold.magentaBright('---> ')}`
+    );
+    if (/^[1-2]$/.test(opcion)) {
+      valid = true;
+    } else {
       console.log(chalk.bold.redBright('Opzione non valida. Inserisci solo 1 o 2.'));
+      process.exit(1);
     }
-  } while (opcion !== '1' && opcion !== '2' || fs.existsSync(`./${authFile}/creds.json`));
+  }
+  rl.close();
 }
 
 console.info = () => {};
+
 const connectionOptions = {
   logger: pino({ level: 'silent' }),
   printQRInTerminal: opcion == '1' ? true : methodCodeQR ? true : false,
@@ -209,7 +220,7 @@ const connectionOptions = {
     let msg = await store.loadMessage(jid, clave.id);
     return msg?.message || "";
   },
-  msgRetryCounterCache, // ora esiste
+  msgRetryCounterCache,
   msgRetryCounterMap,
   decodeJid: (jid) => {
     if (!jid) return jid;
@@ -246,7 +257,7 @@ if (!fs.existsSync(`./${authFile}/creds.json`)) {
         rl.close();
       }
       setTimeout(async () => {
-        let codigo = await conn.requestPairingCode(numeroTelefono); // E.164 senza +
+        let codigo = await conn.requestPairingCode(numeroTelefono);
         codigo = codigo?.match(/.{1,4}/g)?.join("-") || codigo;
         console.log(chalk.yellowBright('Collega il bot...'));
         console.log(chalk.black(chalk.bgCyanBright(`INSERISCI QUESTO CODICE:`)), chalk.black(chalk.bgGreenBright(codigo)));
