@@ -23,7 +23,7 @@ import { Low, JSONFile } from 'lowdb';
 import { mongoDB, mongoDBV2 } from './lib/mongoDB.js';
 import store from './lib/store.js';
 import readline from 'readline';
-import NodeCache from 'node-cache'; // import ESM corretto
+import NodeCache from 'node-cache';
 const { CONNECTING } = ws;
 const { chain } = lodash;
 
@@ -39,16 +39,13 @@ const {
   PHONENUMBER_MCC: PHONENUMBER_MCC_RAW
 } = await import('@realvare/based');
 
-// fallback sicuro per PHONENUMBER_MCC
 const PHONENUMBER_MCC = PHONENUMBER_MCC_RAW ?? {};
 
-// helper E.164: 6–15 cifre, no +, prima cifra 1–9
 const isE164Digits = (s) => /^[1-9]\d{5,14}$/.test(s);
 
-// prefissi paese fallback se PHONENUMBER_MCC mancante
 const CC_PREFIXES = [
   '1','7','20','27','30','31','32','33','34','36','39','40','41','43','44','45','46','47','48','49',
-  '52','54','55','56','57','58','60','61','62','63','64','65','66','81','82','84','86','90','91','92','93','94','95','98'
+  '52','54','55','56','57','58','60','61','62','63','64','65','66','81','82','84','86','90','91','92','93','94','95','98','212'
 ];
 const hasKnownCC = (num) => Object.keys(PHONENUMBER_MCC).length
   ? Object.keys(PHONENUMBER_MCC).some(v => num.startsWith(v))
@@ -162,7 +159,6 @@ const methodCodeQR = process.argv.includes("qr");
 const methodCode = !!phoneNumber || process.argv.includes("code");
 const MethodMobile = process.argv.includes("mobile");
 
-// readline aperta una volta sola, chiusa dopo ultimo input
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 const question = (texto) => new Promise((resolver) => rl.question(texto, resolver));
 let opcion;
@@ -172,6 +168,21 @@ if (methodCodeQR) {
 }
 if (!methodCodeQR && !methodCode && !fs.existsSync(`./${authFile}/creds.json`)) {
   let valid = false;
+
+  function normalizePhoneNumber(input) {
+    let num = input.trim().replace(/[^\d+]/g, '');
+    if (num.startsWith('+')) {
+      num = num.slice(1);
+    }
+    if (hasKnownCC(num)) {
+      return num;
+    }
+    if (num.length >= 6 && num.length <= 15) {
+      return '39' + num;
+    }
+    return null;
+  }
+
   while (!valid) {
     let lineM = '⋯ ⋯ ⋯ ⋯ ⋯ ⋯ ⋯ ⋯ ⋯ ⋯ ⋯ 》';
     opcion = await question(
@@ -197,7 +208,6 @@ if (!methodCodeQR && !methodCode && !fs.existsSync(`./${authFile}/creds.json`)) 
       process.exit(1);
     }
   }
-  // NON chiudere il readline qui
 }
 
 console.info = () => { };
@@ -242,19 +252,22 @@ if (!fs.existsSync(`./${authFile}/creds.json`)) {
       if (MethodMobile) throw new Error(`Impossibile utilizzare un codice di accoppiamento con l'API mobile`);
       let numeroTelefono;
       if (!!phoneNumber) {
-        numeroTelefono = phoneNumber.replace(/\D+/g, '');
+        numeroTelefono = normalizePhoneNumber(phoneNumber);
         if (!(isE164Digits(numeroTelefono) && hasKnownCC(numeroTelefono))) {
-          console.log(chalk.bgBlack(chalk.bold.redBright(`Inserisci il numero WhatsApp in formato E.164 senza +\nEsempio: +39 333 333 3333 -> 393333333333\n`)));
+          console.log(chalk.bgBlack(chalk.bold.redBright(`Inserisci il numero WhatsApp in un formato valido\nEsempio: +39 333 333 3333 oppure 3333333333\n`)));
           process.exit(0);
         }
       } else {
         while (true) {
-          numeroTelefono = await question(chalk.bgBlack(chalk.bold.yellowBright(`Inserisci il numero WhatsApp\nEsempio: +39 333 333 3333\n`)));
-          numeroTelefono = numeroTelefono.replace(/\D+/g, '');
-          if (isE164Digits(numeroTelefono) && hasKnownCC(numeroTelefono)) break;
-          console.log(chalk.bgBlack(chalk.bold.redBright(`Inserisci il numero WhatsApp in formato E.164 senza +\nEsempio: +39 333 333 3333 -> 393333333333\n`)));
+          let numeroInput = await question(chalk.bgBlack(chalk.bold.yellowBright(`Inserisci il numero WhatsApp\nFormato accettato: con o senza +, con o senza spazi\nEsempio: +39 333 333 3333 oppure 3333333333\n`)));
+          const numeroNormalizzato = normalizePhoneNumber(numeroInput);
+          if (numeroNormalizzato && isE164Digits(numeroNormalizzato) && hasKnownCC(numeroNormalizzato)) {
+            numeroTelefono = numeroNormalizzato;
+            break;
+          }
+          console.log(chalk.bgBlack(chalk.bold.redBright(`Numero non valido. Inserisci un numero telefonico corretto.`)));
         }
-        rl.close(); // chiuso solo dopo ultimo input
+        rl.close();
       }
       setTimeout(async () => {
         let codigo = await conn.requestPairingCode(numeroTelefono);
@@ -395,7 +408,6 @@ async function connectionUpdate(update) {
 }
 process.on('uncaughtException', console.error);
 
-// Rate-limit messaggi
 const maxConcurrentMessages = 1;
 let runningMessages = 0;
 const messageQueue = [];
@@ -450,12 +462,10 @@ global.reloadHandler = async function (restatConn) {
     conn.ev.off('connection.update', conn.connectionUpdate);
     conn.ev.off('creds.update', conn.credsUpdate);
   }
-
   conn.welcome = '@user benvenuto/a in @subject';
   conn.bye = '@user ha abbandonato il gruppo';
   conn.sIcon = 'immagine gruppo modificata';
   conn.sRevoke = 'link reimpostato, nuovo link: @revoke';
-
   conn.handler = rateLimitedMessageHandler;
   conn.participantsUpdate = handler.participantsUpdate.bind(global.conn);
   conn.groupsUpdate = handler.groupsUpdate.bind(global.conn);
@@ -463,7 +473,6 @@ global.reloadHandler = async function (restatConn) {
   conn.onCall = handler.callUpdate.bind(global.conn);
   conn.connectionUpdate = connectionUpdate.bind(global.conn);
   conn.credsUpdate = saveCreds.bind(global.conn, true);
-
   conn.ev.on('messages.upsert', conn.handler);
   conn.ev.on('group-participants.update', conn.participantsUpdate);
   conn.ev.on('groups.update', conn.groupsUpdate);
