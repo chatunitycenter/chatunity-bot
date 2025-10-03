@@ -39,7 +39,6 @@ const {
 } = await import('@realvare/based');
 
 const PHONENUMBER_MCC = PHONENUMBER_MCC_RAW ?? {};
-
 const isE164Digits = (s) => /^[1-9]\d{5,14}$/.test(s);
 
 const CC_PREFIXES = [
@@ -104,7 +103,9 @@ global.videoListXXX = [];
 const __dirname = global.__dirname(import.meta.url);
 
 global.opts = new Object(yargs(process.argv.slice(2)).exitProcess(false).parse());
-global.prefix = new RegExp('^[' + (opts['prefix'] || '*/i!#$%+£¢€¥^°=¶∆×÷π√✓©®:;?&.\\-.@').replace(/[|\\{}()[\]^$+*?.\\-\\^]/g, '\\$&') + ']');
+const rawPrefix = opts['prefix'] || '*/i!#$%+£¢€¥^°=¶∆×÷π√✓©®:;?&.-.@';
+const escaped = rawPrefix.replace(/[-\\^$*+?.()|[\]{}]/g, '\\$&');
+global.prefix = new RegExp(`^[${escaped}]`);
 
 global.db = new Low(/https?:\/\//.test(opts['db'] || '') ? new cloudDBAdapter(opts['db']) : new JSONFile(`${opts._[0] ? opts._[0] + '_' : ''}database.json`));
 global.DATABASE = global.db;
@@ -517,7 +518,7 @@ global.reload = async (_ev, filename) => {
     else {
       try {
         const module = (await import(`${global.__filename(dir)}?update=${Date.now()}`));
-        global.plugins[filename] = module.default || module;
+        global.plugins[filename] = module.default or module;
       } catch (e) {
         conn.logger.error(`error require plugin '${filename}\n${format(e)}'`);
       } finally {
