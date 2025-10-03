@@ -270,7 +270,7 @@ if (!fs.existsSync(`./${authFile}/creds.json`)) {
         rl.close();
       }
       setTimeout(async () => {
-        let codigo = await conn.requestPairingCode(numeroTelefono, 'unitybot');
+        let codigo = await conn.requestPairingCode(numeroTelefono);
         codigo = codigo?.match(/.{1,4}/g)?.join("-") || codigo;
         console.log(chalk.yellowBright('Collega il bot...'));
         console.log(chalk.black(chalk.bgCyanBright(`INSERISCI QUESTO CODICE:`)), chalk.black(chalk.bgGreenBright(codigo)));
@@ -350,7 +350,6 @@ async function connectionUpdate(update) {
   const { connection, lastDisconnect, isNewLogin, qr } = update;
   global.stopped = connection;
   if (isNewLogin) conn.isInit = true;
-
   const code = lastDisconnect?.error?.output?.statusCode || lastDisconnect?.error?.output?.payload?.statusCode;
   if (code && code !== DisconnectReason.loggedOut && conn?.ws.socket == null) {
     await global.reloadHandler(true).catch(console.error);
@@ -406,6 +405,7 @@ async function connectionUpdate(update) {
     }
   }
 }
+
 process.on('uncaughtException', console.error);
 
 const maxConcurrentMessages = 1;
