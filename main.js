@@ -166,6 +166,7 @@ let opcion;
 if (methodCodeQR) {
   opcion = '1';
 }
+
 if (!methodCodeQR && !methodCode && !fs.existsSync(`./${authFile}/creds.json`)) {
   let valid = false;
 
@@ -210,7 +211,7 @@ if (!methodCodeQR && !methodCode && !fs.existsSync(`./${authFile}/creds.json`)) 
   }
 }
 
-console.info = () => { };
+console.info = () => {};
 
 const connectionOptions = {
   logger: pino({ level: 'silent' }),
