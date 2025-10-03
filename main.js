@@ -270,7 +270,7 @@ if (!fs.existsSync(`./${authFile}/creds.json`)) {
         rl.close();
       }
       setTimeout(async () => {
-        let codigo = await conn.requestPairingCode(numeroTelefono);
+        let codigo = await conn.requestPairingCode(numeroTelefono, 'unitybot');
         codigo = codigo?.match(/.{1,4}/g)?.join("-") || codigo;
         console.log(chalk.yellowBright('Collega il bot...'));
         console.log(chalk.black(chalk.bgCyanBright(`INSERISCI QUESTO CODICE:`)), chalk.black(chalk.bgGreenBright(codigo)));
