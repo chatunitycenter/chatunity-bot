@@ -1,4 +1,3 @@
-process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '1';
 import './config.js';
 import './api.js';
 import { createRequire } from 'module';
@@ -51,6 +50,16 @@ const hasKnownCC = (num) => Object.keys(PHONENUMBER_MCC).length
   ? Object.keys(PHONENUMBER_MCC).some(v => num.startsWith(v))
   : CC_PREFIXES.some(v => num.startsWith(v));
 
+function normalizePhoneNumber(input) {
+  if (!input) return null;
+  let num = String(input).trim().replace(/[^\d+]/g, '');
+  if (num.startsWith('+')) num = num.slice(1);
+  if (num.startsWith('00')) num = num.slice(2);
+  if (hasKnownCC(num)) return num;
+  if (num.length >= 6 && num.length <= 15) return '39' + num;
+  return null;
+}
+
 const PORT = process.env.PORT || process.env.SERVER_PORT || 3000;
 
 protoType();
@@ -95,7 +104,7 @@ global.videoListXXX = [];
 const __dirname = global.__dirname(import.meta.url);
 
 global.opts = new Object(yargs(process.argv.slice(2)).exitProcess(false).parse());
-global.prefix = new RegExp('^[' + (opts['prefix'] || '*/i!#$%+£¢€¥^°=¶∆×÷π√✓©®:;?&.\\-.@').replace(/[|\\{}()[\]^$+*?.\-\^]/g, '\\$&') + ']');
+global.prefix = new RegExp('^[' + (opts['prefix'] || '*/i!#$%+£¢€¥^°=¶∆×÷π√✓©®:;?&.\\-.@').replace(/[|\\{}()[\]^$+*?.\\-\\^]/g, '\\$&') + ']');
 
 global.db = new Low(/https?:\/\//.test(opts['db'] || '') ? new cloudDBAdapter(opts['db']) : new JSONFile(`${opts._[0] ? opts._[0] + '_' : ''}database.json`));
 global.DATABASE = global.db;
@@ -170,20 +179,6 @@ if (methodCodeQR) {
 if (!methodCodeQR && !methodCode && !fs.existsSync(`./${authFile}/creds.json`)) {
   let valid = false;
 
-  function normalizePhoneNumber(input) {
-    let num = input.trim().replace(/[^\d+]/g, '');
-    if (num.startsWith('+')) {
-      num = num.slice(1);
-    }
-    if (hasKnownCC(num)) {
-      return num;
-    }
-    if (num.length >= 6 && num.length <= 15) {
-      return '39' + num;
-    }
-    return null;
-  }
-
   while (!valid) {
     let lineM = '⋯ ⋯ ⋯ ⋯ ⋯ ⋯ ⋯ ⋯ ⋯ ⋯ ⋯ 》';
     opcion = await question(
@@ -253,8 +248,10 @@ if (!fs.existsSync(`./${authFile}/creds.json`)) {
       if (MethodMobile) throw new Error(`Impossibile utilizzare un codice di accoppiamento con l'API mobile`);
       let numeroTelefono;
       if (!!phoneNumber) {
-        numeroTelefono = normalizePhoneNumber(phoneNumber);
-        if (!(isE164Digits(numeroTelefono) && hasKnownCC(numeroTelefono))) {
+        const normalizedFromEnv = normalizePhoneNumber(phoneNumber);
+        if (normalizedFromEnv && isE164Digits(normalizedFromEnv) && hasKnownCC(normalizedFromEnv)) {
+          numeroTelefono = normalizedFromEnv;
+        } else {
           console.log(chalk.bgBlack(chalk.bold.redBright(`Inserisci il numero WhatsApp in un formato valido\nEsempio: +39 333 333 3333 oppure 3333333333\n`)));
           process.exit(0);
         }
