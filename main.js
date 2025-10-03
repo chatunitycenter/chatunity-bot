@@ -1,3 +1,4 @@
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '1';
 import './config.js';
 import './api.js';
 import { createRequire } from 'module';
@@ -22,7 +23,7 @@ import { Low, JSONFile } from 'lowdb';
 import { mongoDB, mongoDBV2 } from './lib/mongoDB.js';
 import store from './lib/store.js';
 import readline from 'readline';
-import NodeCache from 'node-cache';
+import NodeCache from 'node-cache'; // import ESM corretto
 const { CONNECTING } = ws;
 const { chain } = lodash;
 
@@ -38,26 +39,20 @@ const {
   PHONENUMBER_MCC: PHONENUMBER_MCC_RAW
 } = await import('@realvare/based');
 
+// fallback sicuro per PHONENUMBER_MCC
 const PHONENUMBER_MCC = PHONENUMBER_MCC_RAW ?? {};
+
+// helper E.164: 6–15 cifre, no +, prima cifra 1–9
 const isE164Digits = (s) => /^[1-9]\d{5,14}$/.test(s);
 
+// prefissi paese fallback se PHONENUMBER_MCC mancante
 const CC_PREFIXES = [
   '1','7','20','27','30','31','32','33','34','36','39','40','41','43','44','45','46','47','48','49',
-  '52','54','55','56','57','58','60','61','62','63','64','65','66','81','82','84','86','90','91','92','93','94','95','98','212'
+  '52','54','55','56','57','58','60','61','62','63','64','65','66','81','82','84','86','90','91','92','93','94','95','98'
 ];
 const hasKnownCC = (num) => Object.keys(PHONENUMBER_MCC).length
   ? Object.keys(PHONENUMBER_MCC).some(v => num.startsWith(v))
   : CC_PREFIXES.some(v => num.startsWith(v));
-
-function normalizePhoneNumber(input) {
-  if (!input) return null;
-  let num = String(input).trim().replace(/[^\d+]/g, '');
-  if (num.startsWith('+')) num = num.slice(1);
-  if (num.startsWith('00')) num = num.slice(2);
-  if (hasKnownCC(num)) return num;
-  if (num.length >= 6 && num.length <= 15) return '39' + num;
-  return null;
-}
 
 const PORT = process.env.PORT || process.env.SERVER_PORT || 3000;
 
@@ -103,9 +98,7 @@ global.videoListXXX = [];
 const __dirname = global.__dirname(import.meta.url);
 
 global.opts = new Object(yargs(process.argv.slice(2)).exitProcess(false).parse());
-const rawPrefix = opts['prefix'] || '*/i!#$%+£¢€¥^°=¶∆×÷π√✓©®:;?&.-.@';
-const escaped = rawPrefix.replace(/[-\\^$*+?.()|[\]{}]/g, '\\$&');
-global.prefix = new RegExp(`^[${escaped}]`);
+global.prefix = new RegExp('^[' + (opts['prefix'] || '*/i!#$%+£¢€¥^°=¶∆×÷π√✓©®:;?&.\\-.@').replace(/[|\\{}()[\]^$+*?.\-\^]/g, '\\$&') + ']');
 
 global.db = new Low(/https?:\/\//.test(opts['db'] || '') ? new cloudDBAdapter(opts['db']) : new JSONFile(`${opts._[0] ? opts._[0] + '_' : ''}database.json`));
 global.DATABASE = global.db;
@@ -169,6 +162,7 @@ const methodCodeQR = process.argv.includes("qr");
 const methodCode = !!phoneNumber || process.argv.includes("code");
 const MethodMobile = process.argv.includes("mobile");
 
+// readline aperta una volta sola, chiusa dopo ultimo input
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 const question = (texto) => new Promise((resolver) => rl.question(texto, resolver));
 let opcion;
@@ -176,10 +170,8 @@ let opcion;
 if (methodCodeQR) {
   opcion = '1';
 }
-
 if (!methodCodeQR && !methodCode && !fs.existsSync(`./${authFile}/creds.json`)) {
   let valid = false;
-
   while (!valid) {
     let lineM = '⋯ ⋯ ⋯ ⋯ ⋯ ⋯ ⋯ ⋯ ⋯ ⋯ ⋯ 》';
     opcion = await question(
@@ -205,9 +197,10 @@ if (!methodCodeQR && !methodCode && !fs.existsSync(`./${authFile}/creds.json`)) 
       process.exit(1);
     }
   }
+  // NON chiudere il readline qui
 }
 
-console.info = () => {};
+console.info = () => { };
 
 const connectionOptions = {
   logger: pino({ level: 'silent' }),
@@ -249,24 +242,19 @@ if (!fs.existsSync(`./${authFile}/creds.json`)) {
       if (MethodMobile) throw new Error(`Impossibile utilizzare un codice di accoppiamento con l'API mobile`);
       let numeroTelefono;
       if (!!phoneNumber) {
-        const normalizedFromEnv = normalizePhoneNumber(phoneNumber);
-        if (normalizedFromEnv && isE164Digits(normalizedFromEnv) && hasKnownCC(normalizedFromEnv)) {
-          numeroTelefono = normalizedFromEnv;
-        } else {
-          console.log(chalk.bgBlack(chalk.bold.redBright(`Inserisci il numero WhatsApp in un formato valido\nEsempio: +39 333 333 3333 oppure 3333333333\n`)));
+        numeroTelefono = phoneNumber.replace(/\D+/g, '');
+        if (!(isE164Digits(numeroTelefono) && hasKnownCC(numeroTelefono))) {
+          console.log(chalk.bgBlack(chalk.bold.redBright(`Inserisci il numero WhatsApp in formato E.164 senza +\nEsempio: +39 333 333 3333 -> 393333333333\n`)));
           process.exit(0);
         }
       } else {
         while (true) {
-          let numeroInput = await question(chalk.bgBlack(chalk.bold.yellowBright(`Inserisci il numero WhatsApp\nFormato accettato: con o senza +, con o senza spazi\nEsempio: +39 333 333 3333 oppure 3333333333\n`)));
-          const numeroNormalizzato = normalizePhoneNumber(numeroInput);
-          if (numeroNormalizzato && isE164Digits(numeroNormalizzato) && hasKnownCC(numeroNormalizzato)) {
-            numeroTelefono = numeroNormalizzato;
-            break;
-          }
-          console.log(chalk.bgBlack(chalk.bold.redBright(`Numero non valido. Inserisci un numero telefonico corretto.`)));
+          numeroTelefono = await question(chalk.bgBlack(chalk.bold.yellowBright(`Inserisci il numero WhatsApp\nEsempio: +39 333 333 3333\n`)));
+          numeroTelefono = numeroTelefono.replace(/\D+/g, '');
+          if (isE164Digits(numeroTelefono) && hasKnownCC(numeroTelefono)) break;
+          console.log(chalk.bgBlack(chalk.bold.redBright(`Inserisci il numero WhatsApp in formato E.164 senza +\nEsempio: +39 333 333 3333 -> 393333333333\n`)));
         }
-        rl.close();
+        rl.close(); // chiuso solo dopo ultimo input
       }
       setTimeout(async () => {
         let codigo = await conn.requestPairingCode(numeroTelefono);
@@ -349,6 +337,7 @@ async function connectionUpdate(update) {
   const { connection, lastDisconnect, isNewLogin, qr } = update;
   global.stopped = connection;
   if (isNewLogin) conn.isInit = true;
+
   const code = lastDisconnect?.error?.output?.statusCode || lastDisconnect?.error?.output?.payload?.statusCode;
   if (code && code !== DisconnectReason.loggedOut && conn?.ws.socket == null) {
     await global.reloadHandler(true).catch(console.error);
@@ -404,9 +393,9 @@ async function connectionUpdate(update) {
     }
   }
 }
-
 process.on('uncaughtException', console.error);
 
+// Rate-limit messaggi
 const maxConcurrentMessages = 1;
 let runningMessages = 0;
 const messageQueue = [];
@@ -461,10 +450,12 @@ global.reloadHandler = async function (restatConn) {
     conn.ev.off('connection.update', conn.connectionUpdate);
     conn.ev.off('creds.update', conn.credsUpdate);
   }
+
   conn.welcome = '@user benvenuto/a in @subject';
   conn.bye = '@user ha abbandonato il gruppo';
   conn.sIcon = 'immagine gruppo modificata';
   conn.sRevoke = 'link reimpostato, nuovo link: @revoke';
+
   conn.handler = rateLimitedMessageHandler;
   conn.participantsUpdate = handler.participantsUpdate.bind(global.conn);
   conn.groupsUpdate = handler.groupsUpdate.bind(global.conn);
@@ -472,6 +463,7 @@ global.reloadHandler = async function (restatConn) {
   conn.onCall = handler.callUpdate.bind(global.conn);
   conn.connectionUpdate = connectionUpdate.bind(global.conn);
   conn.credsUpdate = saveCreds.bind(global.conn, true);
+
   conn.ev.on('messages.upsert', conn.handler);
   conn.ev.on('group-participants.update', conn.participantsUpdate);
   conn.ev.on('groups.update', conn.groupsUpdate);
@@ -518,7 +510,7 @@ global.reload = async (_ev, filename) => {
     else {
       try {
         const module = (await import(`${global.__filename(dir)}?update=${Date.now()}`));
-        global.plugins[filename] = module.default or module;
+        global.plugins[filename] = module.default || module;
       } catch (e) {
         conn.logger.error(`error require plugin '${filename}\n${format(e)}'`);
       } finally {
