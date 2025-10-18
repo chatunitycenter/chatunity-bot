@@ -89,7 +89,7 @@ function generateMenuText(prefix, botName, userCount, userId, groupId) {
 ┃◈┃• 🆕 *${prefix}gruppi* 
 ┃◈┃
 ┃◈└───────────┈⊷
-┃◈┃• *${versionText}:* 7.1
+┃◈┃• *${versionText}:* 7.2
 ┃◈┃• ${collabText}
 ┃◈┃• ${usersText}: ${userCount}
 ╰━━━━━━━━━━━━━┈·๏
