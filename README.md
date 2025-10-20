@@ -46,19 +46,43 @@
 
 [![Tutorial Installazione](https://img.shields.io/badge/Tutorial-Installazione-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtube.com/shorts/qek7wWadhtI?feature=share)
 
+```bash
+
 termux-setup-storage
+
 pkg update && pkg upgrade -y
+
 pkg install x11-repo tur-repo
-pkg install git nodejs ffmpeg imagemagick yarn libcairo pango libjpeg-turbo giflib libpixman pkg-config freetype fontconfig xorgproto build-essential python libvips sqlite clang make chromium -y
+
+pkg install git nodejs ffmpeg imagemagick yarn 
+
+libcairo pango libjpeg-turbo giflib libpixman 
+
+pkg-config freetype fontconfig xorgproto 
+
+build-essential python libvips sqlite clang 
+
+make chromium -y
+
 pip install setuptools
+
 export GYP_DEFINES="android_ndk_path=''"
 cd ~
 git clone https://chatunitycenter/chatunity-bot
+
 cd chatunity-bot
+
 npm install node-gyp@latest
+
 yarn install
-npm install canvas sqlite3 puppeteer-core --build-from-source
+
+npm install canvas sqlite3 puppeteer-core 
+
+--build-from-source
+
+
 pip install yt-dlp
+
 node .
 ```
 
