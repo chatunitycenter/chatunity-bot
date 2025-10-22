@@ -67,7 +67,9 @@ make chromium -y
 pip install setuptools
 
 export GYP_DEFINES="android_ndk_path=''"
+
 cd ~
+
 git clone https://chatunitycenter/chatunity-bot
 
 cd chatunity-bot
