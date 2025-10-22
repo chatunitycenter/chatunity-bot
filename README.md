@@ -55,7 +55,7 @@ pkg install git nodejs ffmpeg imagemagick yarn libcairo pango libjpeg-turbo gifl
 pip install setuptools && \
 export GYP_DEFINES="android_ndk_path=''" && \
 cd ~ && \
-git clone git@github.com:chatunitycenter/chatunity-bot.git && \
+git clone https://github.com/chatunitycenter/chatunity-bot.git && \
 cd chatunity-bot && \
 npm install node-gyp@latest && \
 yarn install && \
