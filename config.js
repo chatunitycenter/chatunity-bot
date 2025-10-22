@@ -17,6 +17,9 @@ global.owner = [
   ['393773842461', '𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲', true],
   ['212679029922',],
   ['xxxxxxxxxx',],
+  ['393911291712', 'ven', true], 
+  ['393291759049', 'riri', true], 
+  ['393760494241', 'ken', true], 
   ['xxxxxxxxxx']
 ];
 global.mods = ['xxxxxxxxxx'];
