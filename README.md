@@ -49,12 +49,13 @@
 ```bash
 
 termux-setup-storage && \
-pkg update && pkg upgrade -y && \
-pkg install x11-repo tur-repo -y && \
-pkg install git nodejs ffmpeg imagemagick yarn libcairo pango libjpeg-turbo giflib libpixman pkg-config freetype fontconfig xorgproto build-essential python libvips sqlite clang make chromium binutils -y && \
+pkg update -y && \
+pkg upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" && \
+pkg install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" git nodejs ffmpeg imagemagick yarn libcairo pango libjpeg-turbo giflib libpixman pkg-config freetype fontconfig xorgproto build-essential python libvips sqlite clang make chromium binutils && \
 pip install setuptools && \
 export GYP_DEFINES="android_ndk_path=''" && \
 cd ~ && \
+rm -rf chatunity-bot && \
 git clone https://github.com/chatunitycenter/chatunity-bot.git && \
 cd chatunity-bot && \
 yarn install && \
