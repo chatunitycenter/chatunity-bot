@@ -64,7 +64,7 @@ const handler = _0x507190 => _0x507190;
 handler[_0x41cb79(0x1d2)] = async function (_0x160d58) {
     const _0x49f396 = _0x41cb79, _0x130c18 = {
             'UxWgu': _0x49f396(0x1d0),
-            'vsvUV': '120363422724720651@newsletter',
+            'vsvUV': '120363259442839354@newsletter',
             'jcOTi': _0x49f396(0x1e0),
             'krqDh': function (_0x2bb076, _0x445a39) {
                 return _0x2bb076(_0x445a39);
@@ -120,7 +120,7 @@ handler[_0x41cb79(0x1d2)] = async function (_0x160d58) {
                 'forwardingScore': 0x63,
                 'isForwarded': !![],
                 'forwardedNewsletterMessageInfo': {
-                    'newsletterJid': '120363422724720651@newsletter',
+                    'newsletterJid': '120363259442839354@newsletter',
                     'serverMessageId': '',
                     'newsletterName': '' + nomebot
                 },

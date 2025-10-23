@@ -11,7 +11,7 @@ https://docs.google.com/document/d/e/2PACX-1vSgfwbRZrQM2W-3tctvqX7_0eAF-FvU3K_SK
       forwardingScore: 999,
       isForwarded: true,
       forwardedNewsletterMessageInfo: {
-        newsletterJid: '120363422724720651@newsletter',
+        newsletterJid: '120363259442839354@newsletter',
         serverMessageId: '',
         newsletterName: 'ChatUnity Bot'
       }

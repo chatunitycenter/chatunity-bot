@@ -33,7 +33,7 @@ let handler = async (m, { conn, args }) => {
         menuText += `📌 *Rispondi con il numero per selezionare il modello voce per:*\n"${inputText}"`;
 
         const sentMsg = await conn.sendMessage(m.chat, {
-            image: { url: "https://i.ibb.co/9mWwC5PP/Whats-App-Image-2025-07-06-at-23-32-06.jpg" },
+            image: { url: "https://i.ibb.co/PsmK9LGR/9ddcde5b-b8e5-4fd6-bb74-94a0eeab826c.jpg" },
             caption: menuText
         }, { quoted: m });
 

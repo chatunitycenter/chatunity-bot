@@ -69,7 +69,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
       forwardingScore: 999,
       isForwarded: true,
       forwardedNewsletterMessageInfo: {
-        newsletterJid: '120363422724720651@newsletter',
+        newsletterJid: '120363259442839354@newsletter',
         serverMessageId: '',
         newsletterName: `${nomeDelBot}`
       }
@@ -80,15 +80,15 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     try {
       messageOptions.contextInfo.externalAdReply = {
         title: nomeDelBot,
-        body: `Versione: 6.0`,
+        body: `Versione: 7.0`,
         mediaType: 1,
         renderLargerThumbnail: false,
         previewType: 'thumbnail',
-        thumbnail: await fetchThumbnail('https://i.ibb.co/9mWwC5PP/Whats-App-Image-2025-07-06-at-23-32-06.jpg'),
+        thumbnail: await fetchThumbnail('https://i.ibb.co/PsmK9LGR/9ddcde5b-b8e5-4fd6-bb74-94a0eeab826c.jpg'),
       }
     } catch (error) {
       console.error('Error fetching thumbnail:', error)
-    }
+    } 
   }
 
   try {
