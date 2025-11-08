@@ -36,7 +36,7 @@
 
 [![Tutorial Installazione](https://img.shields.io/badge/Tutorial-Installazione-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/-FZYK-vj4BY)
 
-### 🚀 1. installare la zip & termux del bot presente nella sezione sopra
+### 🚀 1. installare la zip del bot & termux presente nella sezione sopra
 ### 🚀 2. incollare tutto insieme i comandi sottostanti nessuno escluso in ordine
 ```bash
 termux-setup-storage && \
