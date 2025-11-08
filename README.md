@@ -35,8 +35,9 @@
 
 [![Tutorial Installazione](https://img.shields.io/badge/Tutorial-Installazione-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/-FZYK-vj4BY)
 
-### 🚀 1. installare la zip del bot & termux presente nella sezione sopra
-### 🚀 2. incollare tutto insieme i comandi sottostanti nessuno escluso in ordine
+### 🚀 1. Scarica  [CLICCANDO QUI](https://www.mediafire.com/file/unl57j8kxm7lthd/chatunity-bot-main.zip/file) la zip del bot
+### 🚀 2. Scarica  [CLICCANDO QUI](https://www.mediafire.com/file/0npdmv51pnttps0/com.termux_0.119.1-119_minAPI21(arm64-v8a,armeabi-v7a,x86,x86_64)(nodpi)_apkmirror.com.apk/) Termux
+### 🚀 3. incollare tutto insieme i comandi sottostanti su termux
 ```bash
 termux-setup-storage && \
 pkg update && pkg upgrade -y && \
@@ -56,7 +57,7 @@ yarn start
 ## 🚀 Installazione (Termux)
 
 [![Tutorial Installazione](https://img.shields.io/badge/Tutorial-Installazione-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/-FZYK-vj4BY)
-### 🚀 1. installare TERMUX presente nella sezione sopra
+### 🚀 2. Scarica  [CLICCANDO QUI](https://www.mediafire.com/file/0npdmv51pnttps0/com.termux_0.119.1-119_minAPI21(arm64-v8a,armeabi-v7a,x86,x86_64)(nodpi)_apkmirror.com.apk/) Termux
 ### 🚀 2. incollare tutto insieme i comandi sottostanti nessuno escluso in ordine
 ```bash
 termux-setup-storage && \
