@@ -1,48 +1,29 @@
+let linkRegex = /chat.whatsapp.com\/([0-9A-Za-z]{20,24})( [0-9]{1,3}|inf)?/i;
 
-const MIN_MEMBERS = 30;
+let handler = async (m, { conn, text, isOwner, usedPrefix, command }) => {
+    if (!text) return m.reply(`令 Inserisci il link del gruppo.\n> *Esempio:* ${usedPrefix + command} <link> <numero di giorni | inf>.`);
+    let [_, code, expired] = text.match(linkRegex) || [];
+    if (!code) return m.reply('令 Link non valido.');
 
-const handler = async (m, { conn, args }) => {
-    try {
-        if (m.isGroup) throw new Error('❌ Questo comando funziona solo in privato.');
-        if (!args[0]) throw new Error('📩 Usa così:\n\n.join <link gruppo>');
+    let res = await conn.groupAcceptInvite(code);
 
-        const invite = args[0];
-        const match = invite.match(/https:\/\/chat\.whatsapp\.com\/([a-zA-Z0-9]+)/);
-        
-        if (!match) throw new Error('❌ Inserisci un link valido di un gruppo WhatsApp.');
-
-        const code = match[1];
-        const res = await conn.groupGetInviteInfo(code);
-        
-        if (!res) throw new Error('❌ Link non valido o scaduto.');
-
-        const nome = res.subject || "Gruppo sconosciuto";
-        const membri = res.size || 0;
-
-        if (membri < MIN_MEMBERS) {
-            throw new Error(`❌ Il gruppo *${nome}* ha solo ${membri} membri (minimo richiesto: ${MIN_MEMBERS}).`);
-        }
-
-        await conn.groupAcceptInvite(code);
-
-        const responseText = res.joinApprovalRequired 
-            ? `📩 Richiesta inviata al gruppo *${nome}* (${membri} membri).`
-            : `✅ Il bot è entrato nel gruppo *${nome}* (${membri} membri).`;
-
-        return m.reply(responseText);
-
-    } catch (e) {
-        if (e.message && (e.message.includes('❌') || e.message.includes('📩'))) {
-            return m.reply(e.message);
-        }
-        
-        console.error('[JOIN_ERROR]', e);
-        return m.reply(`⚠️ Errore durante il join: ${e.message || e}`);
+    if (expired === 'inf') {
+        m.reply(`令 Mi sono unito correttamente al gruppo senza una data di scadenza.`);
+    } else {
+        expired = Math.floor(Math.min(999, Math.max(1, isOwner ? isNumber(expired) ? parseInt(expired) : 0 : 3)));
+        m.reply(`令 Mi sono unito correttamente al gruppo per *${expired}* giorni.`);
+        let chats = global.db.data.chats[res];
+        if (!chats) chats = global.db.data.chats[res] = {};
+        if (expired) chats.expired = +new Date() + expired * 1000 * 60 * 60 * 24;
     }
 };
 
-handler.command = /^entra$/i;
-handler.help = ['join <link gruppo>'];
-handler.tags = ['group'];
+handler.help = ['join *<link> <giorni | inf>*'];
+handler.tags = ['creatore'];
+
+handler.command = ['join'];
+handler.owner = true;
 
 export default handler;
+
+const isNumber = (x) => (x = parseInt(x), typeof x === 'number' && !isNaN(x));

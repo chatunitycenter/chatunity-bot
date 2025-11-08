@@ -7,7 +7,7 @@ const lenguajeIT = {
   }
   
   let handler = async (m, { conn, args, text }) => {
-    const pp = await conn.profilePictureUrl(m.chat, 'image').catch(_ => null) || './menu/chatunitybot.mp4'
+    const pp = await conn.profilePictureUrl(m.chat, 'image').catch(_ => null) || './media/chatunitybot.mp4'
     
     if (!text) return conn.reply(m.chat, lenguajeIT.smsNam2(), fkontak, m)
     
@@ -35,7 +35,7 @@ const lenguajeIT = {
     }
   }
   
-  handler.command = /^(setname|setnome|nuevonombre)$/i
+  handler.command = /^(setname|setnome)$/i
   handler.group = true
   handler.admin = true
   handler.botAdmin = true

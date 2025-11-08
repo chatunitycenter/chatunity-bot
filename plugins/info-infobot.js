@@ -92,7 +92,7 @@ let handler = async (m, { conn, usedPrefix }) => {
 
 let rcanal = {}; // Define rcanal with an appropriate value (e.g., an empty object or the required value)
 
-let img = './menu/chatunitybot.mp4'; // Ensure this file path is valid and points to an existing image
+let img = './media/chatunitybot.mp4'; // Ensure this file path is valid and points to an existing image
 
 if (!fs.existsSync(img)) {
   img = null; // Fallback to null if the file does not exist

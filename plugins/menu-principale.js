@@ -5,8 +5,10 @@ import { fileURLToPath } from 'url';
 import fs from 'fs';
 import '../lib/language.js';
 
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
 
 const handler = async (message, { conn, usedPrefix, command }) => {
     const userId = message.sender
@@ -15,9 +17,11 @@ const handler = async (message, { conn, usedPrefix, command }) => {
     const userCount = Object.keys(global.db.data.users).length;
     const botName = global.db.data.nomedelbot || 'ChatUnity';
 
+
     const menuText = generateMenuText(usedPrefix, botName, userCount, userId, groupId);
 
-    const imagePath = path.join(__dirname, '../menu/principale.jpeg'); 
+
+    const imagePath = path.join(__dirname, '../media/principale.jpeg'); 
     
     const footerText = global.t('menuFooter', userId, groupId) || 'Scegli un menu:'
     const adminMenuText = global.t('menuAdmin', userId, groupId) || '🛡️ Menu Admin'
@@ -45,14 +49,17 @@ const handler = async (message, { conn, usedPrefix, command }) => {
     );
 };
 
+
 handler.help = ['menu'];
 handler.tags = ['menu'];
 handler.command = /^(menu|comandi)$/i;
 
+
 export default handler;
 
+
 function generateMenuText(prefix, botName, userCount, userId, groupId) {
-    const menuTitle = global.t('mainMenuTitle', userId, groupId) || '💬 𝑴𝑬𝑵𝑼 𝑫𝑬𝑳 𝑩𝑶𝑻 💬'
+    const menuTitle = global.t('mainMenuTitle', userId, groupId) || '𝑴𝑬𝑵𝑼 𝑫𝑬𝑳 𝑩𝑶𝑻'
     const staffText = global.t('staffCommand', userId, groupId) || 'staff'
     const hegemoniaText = global.t('hegemoniaCommand', userId, groupId) || 'egemonia'
     const candidatesText = global.t('candidatesCommand', userId, groupId) || 'candidati'
@@ -70,28 +77,25 @@ function generateMenuText(prefix, botName, userCount, userId, groupId) {
     const usersText = global.t('usersLabel', userId, groupId) || '𝐔𝐓𝐄𝐍𝐓𝐈'
     
     return `
-
-╭〔 *${menuTitle}* 〕┈⊷
-┃◈╭───────────·๏
-┃◈┃• 👑 *${prefix}${staffText}*
-┃◈┃• 👑 *${prefix}${hegemoniaText}*
-┃◈┃• 📜 *${prefix}${candidatesText}*
-┃◈┃• 📥 *${prefix}${installText}*
-┃◈┃• 📖 *${prefix}${guideText}*
-┃◈┃• 📝 *${prefix}${channelsText}* 
-┃◈┃• ⚙ *${prefix}${systemText}*
-┃◈┃• ❓ *${prefix}${faqText}*
-┃◈┃• 🚀 *${prefix}${pingText}*
-┃◈┃• 📝 *${prefix}${reportText}* 
-┃◈┃• 💡 *${prefix}${suggestText}* 
-┃◈┃• 🆕 *${prefix}${newsText}* (aggiornamenti)
-┃◈┃• 🆕 *${prefix}chatunity* (CHATBOT)
-┃◈┃• 🆕 *${prefix}gruppi* 
-┃◈┃
-┃◈└───────────┈⊷
-┃◈┃• *${versionText}:* 7.2
-┃◈┃• ${collabText}
-┃◈┃• ${usersText}: ${userCount}
-╰━━━━━━━━━━━━━┈·๏
+⋆ ︵★ ${menuTitle} ★︵ ⋆
+୧ 👑 ୭ *${prefix}${staffText}*
+୧ 👑 ୭ *${prefix}${hegemoniaText}*
+୧ 📜 ୭ *${prefix}${candidatesText}*
+୧ 📥 ୭ *${prefix}${installText}*
+୧ 📖 ୭ *${prefix}${guideText}*
+୧ 📝 ୭ *${prefix}${channelsText}* 
+୧ ⚙️ ୭ *${prefix}${systemText}*
+୧ ❓ ୭ *${prefix}${faqText}*
+୧ 🚀 ୭ *${prefix}${pingText}*
+୧ 📝 ୭ *${prefix}${reportText}* 
+୧ 💡 ୭ *${prefix}${suggestText}* 
+୧ 🆕 ୭ *${prefix}${newsText}*
+୧ 🤖 ୭ *${prefix}chatunity*
+୧ 🗣️ ୭ *${prefix}gruppi*
+╰♡꒷ ๑ ⋆˚₊⋆──ʚ˚ɞ──⋆˚₊⋆ ๑ ⪩
+  ୧・*${versionText}:* ${vs}
+  ୧・𝐂𝐎𝐋𝐋𝐀𝐁: ${collab}
+  ୧・${usersText}: ${userCount}
+╰♡꒷ ๑ ⋆˚₊⋆──ʚ˚ɞ──⋆˚₊⋆ ๑ ⪩
 `.trim();
 }

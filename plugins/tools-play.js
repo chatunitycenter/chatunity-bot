@@ -4,59 +4,69 @@ import axios from "axios";
 
 const formatAudio = ['mp3', 'm4a', 'webm', 'acc', 'flac', 'opus', 'ogg', 'wav'];
 const formatVideo = ['360', '480', '720', '1080'];
-const MAX_DURATION = 600; // 5 minuti in secondi
+const MAX_DURATION = 600;
 
-const ddownr = {
-  download: async (url, format) => {
-    if (!formatAudio.includes(format) && !formatVideo.includes(format)) {
-      throw new Error('╭━━〔 ❗ 〕━━┈⊷\n┃◈ *Formato non supportato*\n╰━━━━━━━━━━┈·๏');
-    }
-
-    try {
-      const { data } = await axios.get(`https://p.oceansaver.in/ajax/download.php?format=${format}&url=${encodeURIComponent(url)}&api=dfcb6d76f2f6a9894gjkege8a4ab232222`, {
-        headers: { 'User-Agent': 'Mozilla/5.0' }
-      });
-
-      if (data?.success) {
-        return {
-          id: data.id,
-          image: data.info.image,
-          title: data.title,
-          downloadUrl: await ddownr.cekProgress(data.id)
-        };
-      } else {
-        throw new Error('╭━━〔 ❗ 〕━━┈⊷\n┃◈ *Errore nel recupero dei dettagli*\n╰━━━━━━━━━━┈·๏');
-      }
-    } catch (error) {
-      console.error('Errore:', error.message);
-      throw new Error('╭━━〔 ❗ 〕━━┈⊷\n┃◈ *Errore nel download*\n╰━━━━━━━━━━┈·๏');
-    }
-  },
-
-  cekProgress: async (id) => {
-    try {
-      while (true) {
-        const { data } = await axios.get(`https://p.oceansaver.in/ajax/progress.php?id=${id}`, {
-          headers: { 'User-Agent': 'Mozilla/5.0' }
-        });
-
-        if (data?.success && data.progress === 1000) {
-          return data.download_url;
-        }
-        await new Promise(resolve => setTimeout(resolve, 3000));
-      }
-    } catch (error) {
-      console.error('Errore:', error.message);
-      throw new Error('╭━━〔 ❗ 〕━━┈⊷\n┃◈ *Errore nel check progresso*\n╰━━━━━━━━━━┈·๏');
-    }
-  }
+global.APIs = {
+  xyro: { url: "https://xyro.site", key: null },
+  yupra: { url: "https://api.yupra.my.id", key: null },
+  vreden: { url: "https://api.vreden.web.id", key: null },
+  delirius: { url: "https://api.delirius.store", key: null },
+  zenzxz: { url: "https://api.zenzxz.my.id", key: null },
+  siputzx: { url: "https://api.siputzx.my.id", key: null }
 };
 
-const handler = async (m, { conn, text, usedPrefix, command, args }) => {
+async function fetchFromApis(apis) {
+  for (const { api, endpoint, extractor } of apis) {
+    try {
+      const res = await fetch(endpoint, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+      const json = await res.json();
+      const url = extractor(json);
+      if (url) {
+        return { api, url };
+      }
+    } catch (e) {}
+  }
+  throw new Error(`
+꒰🩸꒱ ◦•≫ ERRORE
+ ★・・・・・・・★
+  Nessun link valido trovato
+ ★・・・・・・・★
+`);
+}
+
+async function getAud(url) {
+  const apis = [
+    { api: 'Xyro', endpoint: `${global.APIs.xyro.url}/download/youtubemp3?url=${encodeURIComponent(url)}`, extractor: res => res.result?.dl },
+    { api: 'Yupra', endpoint: `${global.APIs.yupra.url}/api/downloader/ytmp3?url=${encodeURIComponent(url)}`, extractor: res => res.resultado?.enlace },
+    { api: 'Vreden', endpoint: `${global.APIs.vreden.url}/api/ytmp3?url=${encodeURIComponent(url)}`, extractor: res => res.result?.download?.url },
+    { api: 'Delirius', endpoint: `${global.APIs.delirius.url}/download/ymp3?url=${encodeURIComponent(url)}`, extractor: res => res.data?.download?.url },
+    { api: 'ZenzzXD', endpoint: `${global.APIs.zenzxz.url}/downloader/ytmp3?url=${encodeURIComponent(url)}`, extractor: res => res.download_url },
+    { api: 'ZenzzXD v2', endpoint: `${global.APIs.zenzxz.url}/downloader/ytmp3v2?url=${encodeURIComponent(url)}`, extractor: res => res.download_url }
+  ];
+  return await fetchFromApis(apis);
+}
+
+async function getVid(url) {
+  const apis = [
+    { api: 'Xyro', endpoint: `${global.APIs.xyro.url}/download/youtubemp4?url=${encodeURIComponent(url)}&quality=360`, extractor: res => res.result?.dl },
+    { api: 'Yupra', endpoint: `${global.APIs.yupra.url}/api/downloader/ytmp4?url=${encodeURIComponent(url)}`, extractor: res => res.resultado?.formatos?.[0]?.url },
+    { api: 'Vreden', endpoint: `${global.APIs.vreden.url}/api/ytmp4?url=${encodeURIComponent(url)}`, extractor: res => res.result?.download?.url },
+    { api: 'Delirius', endpoint: `${global.APIs.delirius.url}/download/ytmp4?url=${encodeURIComponent(url)}`, extractor: res => res.data?.download?.url },
+    { api: 'ZenzzXD', endpoint: `${global.APIs.zenzxz.url}/downloader/ytmp4?url=${encodeURIComponent(url)}`, extractor: res => res.download_url },
+    { api: 'ZenzzXD v2', endpoint: `${global.APIs.zenzxz.url}/downloader/ytmp4v2?url=${encodeURIComponent(url)}`, extractor: res => res.download_url }
+  ];
+  return await fetchFromApis(apis);
+}
+
+const handler = async (m, { conn, text, usedPrefix, command }) => {
   try {
     if (!text.trim()) {
-      await conn.sendMessage(m.chat, { 
-        text: `╭━━〔 ❗ 〕━━┈⊷\n┃◈ *Inserisci un titolo o un link*\n╰━━━━━━━━━━┈·๏`,
+      await conn.sendMessage(m.chat, {
+        text: `
+╭﹕₊˚ ★ ⁺˳ꕤ₊⁺・꒱
+  ━━✫ ❗ Inserisci un titolo o link
+╰﹕₊˚ ★ ⁺˳ꕤ₊⁺・꒱
+`,
         contextInfo: {
           forwardingScore: 99,
           isForwarded: true,
@@ -70,12 +80,15 @@ const handler = async (m, { conn, text, usedPrefix, command, args }) => {
       return;
     }
 
-    // Gestione bottoni: playaudio/playvideo
     if (command === 'playaudio' || command === 'playvideo') {
       const search = await yts(text);
       if (!search.all.length) {
-        await conn.sendMessage(m.chat, { 
-          text: '╭━━〔 ❗ 〕━━┈⊷\n┃◈ *Nessun risultato trovato*\n╰━━━━━━━━━━┈·๏',
+        await conn.sendMessage(m.chat, {
+          text: `
+╭﹕₊˚ ★ ⁺˳ꕤ₊⁺・꒱
+  ━━✫ ❗ Nessun risultato trovato
+╰﹕₊˚ ★ ⁺˳ꕤ₊⁺・꒱
+`,
           contextInfo: {
             forwardingScore: 99,
             isForwarded: true,
@@ -93,10 +106,17 @@ const handler = async (m, { conn, text, usedPrefix, command, args }) => {
       const thumb = (await conn.getFile(thumbnail))?.data;
 
       if (command === 'playaudio') {
-        await conn.sendMessage(m.chat, { text: '🎵 𝐚𝐮𝐝𝐢𝐨 𝐢𝐧 𝐚𝐫𝐫𝐢𝐯𝐨 𝐚𝐭𝐭𝐞𝐧𝐝𝐢 𝐪𝐮𝐚𝐥𝐜𝐡𝐞 𝐢𝐬𝐭𝐚𝐧𝐭𝐞...' }, { quoted: m });
-        const api = await ddownr.download(url, 'mp3');
         await conn.sendMessage(m.chat, { 
-          audio: { url: api.downloadUrl }, 
+          text: `
+┊ ┊ ┊ ┊‿ ˚➶ ｡˚
+┊ ┊ ┊ ┊. ➶ ˚
+┊ ┊ ┊ ˚✧ 🎵 Audio in arrivo
+┊ ˚➶ ｡˚ ☁︎ Attendi qualche istante...
+` 
+        }, { quoted: m });
+        const { url: downloadUrl } = await getAud(url);
+        await conn.sendMessage(m.chat, {
+          audio: { url: downloadUrl },
           mimetype: "audio/mpeg",
           contextInfo: {
             forwardingScore: 99,
@@ -109,60 +129,46 @@ const handler = async (m, { conn, text, usedPrefix, command, args }) => {
           }
         }, { quoted: m });
       } else {
-        await conn.sendMessage(m.chat, { text: '🎬 𝐯𝐢𝐝𝐞𝐨 𝐢𝐧 𝐚𝐫𝐫𝐢𝐯𝐨 𝐚𝐭𝐭𝐞𝐧𝐝𝐢 𝐪𝐮𝐚𝐥𝐜𝐡𝐞 𝐢𝐬𝐭𝐚𝐧𝐭𝐞...' }, { quoted: m });
-        let sources = [
-          `https://api.siputzx.my.id/api/d/ytmp4?url=${url}`,
-          `https://api.zenkey.my.id/api/download/ytmp4?apikey=zenkey&url=${url}`,
-          `https://axeel.my.id/api/download/video?url=${encodeURIComponent(url)}`,
-          `https://delirius-apiofc.vercel.app/download/ytmp4?url=${url}`
-        ];
-        const results = await Promise.allSettled(sources.map(src => fetch(src).then(res => res.json())));
-        for (const result of results) {
-          if (result.status === "fulfilled") {
-            const { data, result: resResult, downloads } = result.value;
-            const downloadUrl = data?.dl || resResult?.download?.url || downloads?.url || data?.download?.url;
-            if (downloadUrl) {
-              return await conn.sendMessage(m.chat, {
-                video: { url: downloadUrl },
-                fileName: `${title}.mp4`,
-                mimetype: 'video/mp4',
-                caption: '✅ *Download completato!*',
-                thumbnail: thumb,
-                contextInfo: {
-                  forwardingScore: 99,
-                  isForwarded: true,
-                  forwardedNewsletterMessageInfo: {
-                    newsletterJid: '120363259442839354@newsletter',
-                    serverMessageId: '',
-                    newsletterName: 'ChatUnity'
-                  }
-                }
-              }, { quoted: m });
-            }
-          }
-        }
         await conn.sendMessage(m.chat, { 
-          text: '╭━━〔 ❗ 〕━━┈⊷\n┃◈ *Nessun link valido trovato*\n╰━━━━━━━━━━┈·๏',
-          contextInfo: {
-            forwardingScore: 99,
-            isForwarded: true,
-            forwardedNewsletterMessageInfo: {
-              newsletterJid: '120363259442839354@newsletter',
-              serverMessageId: '',
-              newsletterName: 'ChatUnity'
-            }
-          }
+          text: `
+┊ ┊ ┊ ┊‿ ˚➶ ｡˚
+┊ ┊ ┊ ┊. ➶ ˚
+┊ ┊ ┊ ˚✧ 🎬 Video in arrivo
+┊ ˚➶ ｡˚ ☁︎ Attendi qualche istante...
+` 
         }, { quoted: m });
+        const { url: downloadUrl } = await getVid(url);
+        if (downloadUrl) {
+          return await conn.sendMessage(m.chat, {
+            video: { url: downloadUrl },
+            fileName: `${title}.mp4`,
+            mimetype: 'video/mp4',
+            caption: '✅ Download completato!',
+            thumbnail: thumb,
+            contextInfo: {
+              forwardingScore: 99,
+              isForwarded: true,
+              forwardedNewsletterMessageInfo: {
+                newsletterJid: '120363259442839354@newsletter',
+                serverMessageId: '',
+                newsletterName: 'ChatUnity'
+              }
+            }
+          }, { quoted: m });
+        }
       }
       return;
     }
 
-    // Solo .play mostra i bottoni, non scarica nulla
     if (command === 'play') {
       const search = await yts(text);
       if (!search.all.length) {
-        await conn.sendMessage(m.chat, { 
-          text: '╭━━〔 ❗ 〕━━┈⊷\n┃◈ *Nessun risultato trovato*\n╰━━━━━━━━━━┈·๏',
+        await conn.sendMessage(m.chat, {
+          text: `
+╭﹕₊˚ ★ ⁺˳ꕤ₊⁺・꒱
+  ━━✫ ❗ Nessun risultato trovato
+╰﹕₊˚ ★ ⁺˳ꕤ₊⁺・꒱
+`,
           contextInfo: {
             forwardingScore: 99,
             isForwarded: true,
@@ -179,8 +185,14 @@ const handler = async (m, { conn, text, usedPrefix, command, args }) => {
       const videoInfo = search.all[0];
       const durationInSeconds = videoInfo.seconds;
       if (durationInSeconds > MAX_DURATION) {
-        return await conn.sendMessage(m.chat, { 
-          text: `╭━━〔 ❗ 〕━━┈⊷\n┃◈ *Video troppo lungo!*\n┃◈ La durata massima consentita è 5 minuti\n┃◈ Durata attuale: ${videoInfo.timestamp}\n╰━━━━━━━━━━┈·๏`,
+        return await conn.sendMessage(m.chat, {
+          text: `
+╭★────★────★────★────★────★
+|ㅤㅤㅤㅤㅤㅤㅤ꒰¡VIDEO TROPPO LUNGO!꒱
+|˚₊꒷ ⏳ ꒱ ฅ﹕Massimo: 5 minuti ₊˚๑
+|˚₊꒷ ⌛ ꒱ ฅ﹕Durata: ${videoInfo.timestamp} ₊˚๑
+╰★────★────★────★────★────★
+`,
           contextInfo: {
             forwardingScore: 99,
             isForwarded: true,
@@ -196,16 +208,21 @@ const handler = async (m, { conn, text, usedPrefix, command, args }) => {
       const { title, thumbnail, timestamp, views, ago, url, author } = videoInfo;
       const formattedViews = new Intl.NumberFormat().format(views);
       const infoMessage = `
-╭〔*🎥 𝑰𝑵𝑭𝑶 𝑽𝑰𝑫𝑬𝑶*〕┈⊷
-┃◈╭─────────·๏
-┃◈┃• ✍️𝒕𝒊𝒕𝒐𝒍𝒐: ${title}
-┃◈┃• ⏳𝒅𝒖𝒓𝒂𝒕𝒂: ${timestamp}
-┃◈┃• 👀𝒗𝒊𝒔𝒖𝒂𝒍: ${formattedViews}
-┃◈┃• 🔰𝒄𝒂𝒏𝒂𝒍𝒆: ${author?.name ||"Sconosciuto"}
-┃◈┃• 🔳𝒑𝒖𝒃𝒃𝒍𝒊𝒄𝒂𝒕𝒐: ${ago}
-┃◈┃• 🔗𝒍𝒊𝒏𝒌: ${url}
-┃◈└───────┈⊷
-╰━━━━━━━━━┈·๏`;
+⋆ ︵︵ ★ 🎥 INFO VIDEO 🎥 ★ ︵︵ ⋆
+
+꒷꒦ ✦ ୧・︶ : ︶ ꒷꒦ ‧₊ ୧
+୧ ✍️ *Titolo:* ${title}
+୧ ⏳ *Durata:* ${timestamp}
+୧ 👀 *Visualizzazioni:* ${formattedViews}
+୧ 🔰 *Canale:* ${author?.name || "Sconosciuto"}
+୧ 🔳 *Pubblicato:* ${ago}
+୧ 🔗 *Link:* ${url}
+꒷꒦ ✦ ୧・︶ : ︶ ꒷꒦ ‧₊ ୧
+
+╰♡꒷ ๑ ⋆˚₊⋆───ʚ˚ɞ───⋆˚₊⋆ ๑ ⪩
+  > Scegli un formato per scaricare
+╰♡꒷ ๑ ⋆˚₊⋆───ʚ˚ɞ───⋆˚₊⋆ ๑ ⪩
+`;
 
       const thumb = (await conn.getFile(thumbnail))?.data;
 
@@ -213,9 +230,9 @@ const handler = async (m, { conn, text, usedPrefix, command, args }) => {
         text: infoMessage,
         footer: 'Scegli un formato:',
         buttons: [
-          { buttonId: `${usedPrefix}playaudio ${title}`, buttonText: { displayText: "🎵 𝒔𝒄𝒂𝒓𝒊𝒄𝒂 𝒂𝒖𝒅𝒊𝒐" }, type: 1 },
-          { buttonId: `${usedPrefix}playvideo ${title}`, buttonText: { displayText: "🎬 𝒔𝒄𝒂𝒓𝒊𝒄𝒂 𝒗𝒊𝒅𝒆𝒐" }, type: 1 },
-          { buttonId: `${usedPrefix}salva ${title}`, buttonText: { displayText: "💾 𝒔𝒂𝒍𝒗𝒂 𝒏𝒆𝒍𝒍𝒂 𝒑𝒍𝒂𝒚𝒍𝒊𝒔𝒕" }, type: 1 }
+          { buttonId: `${usedPrefix}playaudio ${title}`, buttonText: { displayText: "🎵 Audio" }, type: 1 },
+          { buttonId: `${usedPrefix}playvideo ${title}`, buttonText: { displayText: "🎬 Video" }, type: 1 },
+          { buttonId: `${usedPrefix}salva ${title}`, buttonText: { displayText: "💾 Salva Playlist" }, type: 1 }
         ],
         viewOnce: true,
         headerType: 4,
@@ -239,10 +256,14 @@ const handler = async (m, { conn, text, usedPrefix, command, args }) => {
       return;
     }
 
-    // ...rimuovi invio automatico audio/video da qui...
   } catch (error) {
-    await conn.sendMessage(m.chat, { 
-      text: error.message.startsWith('╭━━') ? error.message : `╭━━〔 ❗ 〕━━┈⊷\n┃◈ *Errore:* ${error.message}\n╰━━━━━━━━━━┈·๏`,
+    await conn.sendMessage(m.chat, {
+      text: error.message.startsWith('꒰🩸꒱') ? error.message : `
+꒰🩸꒱ ◦•≫ ERRORE
+ ★・・・・・・・★
+  ${error.message}
+ ★・・・・・・・★
+`,
       contextInfo: {
         forwardingScore: 99,
         isForwarded: true,
@@ -260,4 +281,3 @@ handler.command = handler.help = ['play', 'playaudio', 'playvideo', 'ytmp4', 'pl
 handler.tags = ['downloader'];
 
 export default handler;
-

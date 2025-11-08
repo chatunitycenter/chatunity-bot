@@ -1,4 +1,4 @@
-//ANTIPAKI BY CHATUNITY
+
 
 let handler = m => m
 handler.before = async function (m, {conn, isAdmin, isBotAdmin, isOwner, isROwner}) {

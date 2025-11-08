@@ -8,14 +8,19 @@ global.confirmCode = '';
 global.nomebot = '𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲-𝐁𝐨𝐭';
 global.packname = '𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲-𝐁𝐨𝐭';
 global.author = '𝐌𝐝';
-global.vs = '7.2';
+global.vs = '8.0';
+global.collab = 'Demon Slayer';
 global.wm = global.nomebot;
 global.wait = 'ⓘ 𝐂𝐚𝐫𝐢𝐜𝐚𝐦𝐞𝐧𝐭𝐨 ...';
 
 
 global.owner = [
   ['393773842461', '𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲', true],
-  ['xxxxxxxxxx',],
+  ['xxxxxxxxxx'],
+  ['xxxxxxxxxx'],
+  ['xxxxxxxxxx'],
+  ['xxxxxxxxxx'],
+  ['xxxxxxxxxx'],
   ['xxxxxxxxxx']
 ];
 global.mods = ['xxxxxxxxxx'];
@@ -45,13 +50,15 @@ global.APIs = {
   zenzapis: 'https://zenzapis.xyz',
   akuari: 'https://api.akuari.my.id',
   akuari2: 'https://apimu.my.id'
+  
 };
 
 global.APIKeys = {
   'https://api.xteam.xyz': global.keysxteam,
   'https://api.lolhuman.xyz': '85faf717d0545d14074659ad',
   'https://api.neoxr.my.id': global.keysneoxr,
-  'https://violetics.pw': 'beta'
+  'https://violetics.pw': 'beta',
+
 };
 
 global.multiplier = 69;

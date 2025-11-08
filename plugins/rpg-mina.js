@@ -57,11 +57,9 @@ let handler = async (m, { conn }) => {
   }, { quoted: m })
   
   cooldowns[m.sender] = Date.now()
-  
-  // Salvataggio nel DB
+
   await writeDB(db)
 
-  // Reazione opzionale
   await m.react('⛏')
 }
 

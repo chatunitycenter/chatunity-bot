@@ -47,7 +47,7 @@ export async function before(m, { isAdmin, isBotAdmin, conn }) {
                     }
 
                     await conn.groupSettingUpdate(m.chat, 'not_announcement');
-                    await conn.sendMessage(m.chat, { text: '*antispam by Chatunity x 333 detected*' });
+                    await conn.sendMessage(m.chat, { text: '*antispam by Chatunity attivato!!*' });
                     delete userSpamCounters[m.chat][sender];
 
                 } catch (error) {

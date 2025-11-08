@@ -6,6 +6,6 @@ m.reply(`ⓘ 𝐈𝐥 𝐛𝐞𝐧𝐯𝐞𝐧𝐮𝐭𝐨 𝐞̀ 𝐬𝐭𝐚�
 }
 handler.help = ['setwelcome <text>']
 handler.tags = ['group']
-handler.command = ['setwelcome'] 
+handler.command = ['setwelcome', 'setbenvenuto'] 
 handler.admin = true
 export default handler

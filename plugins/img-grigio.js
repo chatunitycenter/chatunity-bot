@@ -4,15 +4,12 @@ import fs from 'fs';
 import os from 'os';
 import path from "path";
 
-// Sistema comando diretto (compatibile con handler.js)
 let handler = async (m, { conn, args }) => {
   try {
-    // Cerca l'immagine nel messaggio quotato o nel messaggio stesso
     let quotedMsg = m.quoted ? m.quoted : m;
     let mimeType = (quotedMsg.msg || quotedMsg).mimetype || '';
 
     let mediaBuffer;
-    // Se rispondo a un messaggio normale (non immagine), prendi la foto profilo del target
     if (m.quoted && (!mimeType || !mimeType.startsWith('image/'))) {
       let who = m.quoted.sender || m.sender;
       try {
@@ -24,7 +21,6 @@ let handler = async (m, { conn, args }) => {
         return m.reply("Non è stato possibile recuperare la foto profilo di questo utente.");
       }
     }
-    // Se non c'è quoted e non c'è immagine, prendi la foto profilo dell'utente che ha inviato il comando
     else if (!m.quoted && (!mimeType || !mimeType.startsWith('image/'))) {
       let who = m.sender;
       try {
@@ -36,12 +32,10 @@ let handler = async (m, { conn, args }) => {
         return m.reply("Non hai una foto profilo o non è stato possibile recuperarla.");
       }
     }
-    // Se c'è quoted e contiene immagine, usa quella
     else {
       mediaBuffer = await quotedMsg.download();
     }
 
-    // Get file extension based on mime type
     let extension = '';
     if (mimeType.includes('image/jpeg')) extension = '.jpg';
     else if (mimeType.includes('image/png')) extension = '.png';
@@ -52,7 +46,6 @@ let handler = async (m, { conn, args }) => {
     const tempFilePath = path.join(os.tmpdir(), `imgscan_${Date.now()}${extension}`);
     fs.writeFileSync(tempFilePath, mediaBuffer);
 
-    // Upload to Catbox
     const form = new FormData();
     form.append('fileToUpload', fs.createReadStream(tempFilePath), `image${extension}`);
     form.append('reqtype', 'fileupload');
@@ -68,7 +61,6 @@ let handler = async (m, { conn, args }) => {
       throw "Failed to upload image to Catbox";
     }
 
-    // Scan the image using the API
     const apiUrl = `https://api.popcat.xyz/v2/greyscale?image=${encodeURIComponent(imageUrl)}`;
     const response = await axios.get(apiUrl, { responseType: "arraybuffer" });
 
@@ -89,7 +81,6 @@ let handler = async (m, { conn, args }) => {
   }
 };
 
-// Definizione comando per handler.js
 handler.help = ['grey'];
 handler.tags = ['img'];
 handler.command = /^(grey|greyedit)$/i;

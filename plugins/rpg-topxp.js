@@ -1,6 +1,6 @@
 /* 
 ==========================================
-Crediti al solo e unico kekko aka nexus
+Crediti al solo e unico kekko
 github.com/kekk00
 ==========================================
 */

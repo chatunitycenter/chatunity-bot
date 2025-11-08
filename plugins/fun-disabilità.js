@@ -1,60 +1,64 @@
+import { promises as fs } from 'fs';
+
 let handler = async (m, { conn, command, text, usedPrefix }) => {
     let target = text ? text.replace(/[@]/g, '') + '@s.whatsapp.net' : (m.quoted ? m.quoted.sender : m.mentionedJid && m.mentionedJid[0]);
-    if (!target) return conn.reply(m.chat, `🚨 *TAGGA QUALCUNO, DIO CANE!* 🚨\nEsempio: *${usedPrefix}${command} @tuoexmiglioreamico*`, m);
+    if (!target) return conn.reply(m.chat, `🚨 *TAGGA QUALCUNO, GENIO!* 🚨\nEsempio: *${usedPrefix}${command} @nome*`, m);
 
     let name = await conn.getName(target);
-    let randomPercent = Math.floor(Math.random() * 100) + 1;
+    let randomPercent = Math.floor(Math.random() * 101);
 
-    // Frasi satiriche e spietate
-    let frasiTaglienti = [
-        `🧠 *Il suo QI? Stabile come il Bitcoin nel 2018.* 📉`,  
-        `💡 *Se l'ignoranza fosse luce, sarebbe un faro.* 🌟`,  
-        `🏆 *Campione olimpico di "Eh?" e "Come?"* 🥇`,  
-        `🦉 *Saggezza zero, ma almeno è simpatico... no?* 🙃`,  
-        `🌌 *La sua mente? Un vuoto cosmico.* 🚀`,  
-        `📚 *Se la stupidità fosse un libro, sarebbe un'enciclopedia.* 📖`,  
-        `🛠️ *Ha due neuroni e litigano per il terzo posto.* ⚡`,  
-        `🎭 *Parla tanto ma dice sempre... nulla.* 🤡`
+    let frasi = [
+        "È la prova che la natura a volte fa 'copia e incolla' sbagliato.",
+        "Il suo albero genealogico è un cerchio perfetto.",
+        "Se l'intelligenza fosse benzina, non gli basterebbe per il motorino di una formica.",
+        "È la versione umana di un CAPTCHA fallito.",
+        "Quando Dio ha distribuito i cervelli, lui era in bagno.",
+        "Ha così tanta segatura in testa che potrebbe costruire un mobile IKEA.",
+        "È l'equivalente umano di un modem 56k che prova a scaricare un film in 4K.",
+        "Se i suoi pensieri fossero soldi, sarebbe al verde.",
+        "Da qualche parte c'è un villaggio a cui manca il suo scemo. L'abbiamo trovato.",
+        "Ha il QI di un tostapane, ma è meno utile."
     ];
 
-    let fraseRandom = frasiTaglienti[Math.floor(Math.random() * frasiTaglienti.length)];
+    let fraseRandom = frasi[Math.floor(Math.random() * frasi.length)];
 
-    // Messaggio finale SPARA A ZERO
-    let messaggioFinale = `
-⚡ *📜 VERDETTO UFFICIALE DI "${command.toUpperCase()}" 📜* ⚡
+    let conclusione;
+    if (randomPercent > 90) {
+        conclusione = "🔴 CASO DISPERATO. Si consiglia l'eutanasia sociale.";
+    } else if (randomPercent > 70) {
+        conclusione = "🟠 PERICOLO PUBBLICO. Non lasciatelo procreare.";
+    } else if (randomPercent > 40) {
+        conclusione = "🟡 MEDIOCRE. Utile solo come cattivo esempio.";
+    } else {
+        conclusione = "🟢 MIRACOLO. Forse c'è speranza... o forse il test è rotto.";
+    }
 
-🧑 *Soggetto Analizzato:* ${name}  
-📉 *Livello di "${command}":* ${randomPercent}% ${randomPercent > 80 ? "☠️ *GRAVE PERICOLO SOCIALE* ☠️" : "🤏 *Quasi accettabile... quasi*"}  
+    let messaggio = `
+*⚡️ VERDETTO FINALE ⚡️*
 
-${fraseRandom}  
+*Soggetto:* ${name}
+*Livello di "${command.toUpperCase()}":* ${randomPercent}%
 
-${randomPercent > 90 ? 
-    "🚨 *AVVERTENZA:* La sua presenza potrebbe causare perdita di cellule cerebrali. Usare con cautela." : 
-    randomPercent < 20 ? 
-    "🦸 *Miracolo! Riesce a respirare e pensare contemporaneamente!*" : 
-    "💀 *Sopravviverai... forse.*"
-}  
+*Diagnosi:* ${fraseRandom}
 
-💥 *CONCLUSIONE:* ${randomPercent > 70 ? 
-    "*La selezione naturale ha fallito.*" : 
-    "*Potrebbe essere utile come esempio di cosa non fare.*"
-}`.trim();
+*Prognosi:* ${conclusione}
+    `.trim();
 
     await conn.sendMessage(m.chat, { 
-        text: messaggioFinale,
+        text: messaggio,
         contextInfo: {
             forwardingScore: 999,
             isForwarded: true,
             forwardedNewsletterMessageInfo: {
                 newsletterJid: '120363259442839354@newsletter',
-                newsletterName: '🔥 *SALA VERDETTI SPARATI* 🔥'
+                newsletterName: '🔥 ISTITUTO NAZIONALE IDIOZIA 🔥'
             }
         },
         mentions: [target]
     }, { quoted: m });
 };
 
-handler.help = ['down', 'ritardato', 'mongoloide', 'disabile', 'ritardata'].map(v => v + ' @tag | nome');
+handler.help = ['down', 'ritardato', 'mongoloide', 'disabile', 'ritardata'].map(v => v + ' [@tag]');
 handler.tags = ['satira', 'game'];
 handler.command = /^(down|ritardato|mongoloide|disabile|ritardata)$/i;
 

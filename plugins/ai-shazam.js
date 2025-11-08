@@ -42,7 +42,7 @@ RISULTATO DELLA RICERCA
       }
     };
 
-    // Invia il messaggio con inoltro
+
     m.reply(txt, null, { ...messageOptions })
   } else throw '╰⊱❗️⊱ *USO ERRATO* ⊱❗️⊱╮\n\nRISPONDI A UN AUDIO O VIDEO'
 }

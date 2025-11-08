@@ -1,15 +1,14 @@
 let handler = async (m, { conn, command, text }) => {
-    // Genera un livello casuale di alcol nel sangue
+
     let width = Math.floor(Math.random() * 101);
 
-    // Determina il messaggio in base al livello
     let finalPhrase = width >= 70 
         ? "🌿 Attenti che si pippa pure la farina" 
         : width >= 30 
         ? "🌿 Non sa pippare, aumenta le dosi!!" 
         : "🌿 Un'esempio da seguire, complimenti.";
 
-    // Creazione del messaggio
+
     let message = `
 『💬』 ══ •⊰✰⊱• ══ 『💬』
 
@@ -28,12 +27,11 @@ ${finalPhrase}
             forwardedNewsletterMessageInfo: {
                 newsletterJid: '120363259442839354@newsletter',
                 serverMessageId: '',
-                newsletterName: `ChatUnity` // Utilizzo della variabile botName
+                newsletterName: `ChatUnity` 
             },
         }
     };
 
-    // Invia il messaggio con le menzioni e le opzioni
     m.reply(message, null, { mentions: conn.parseMention(message), ...messageOptions });
 };
 

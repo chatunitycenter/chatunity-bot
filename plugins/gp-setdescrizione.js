@@ -1,7 +1,7 @@
 const handler = async (m, { conn, args }) => {
     try {
       
-      const pp = await conn.profilePictureUrl(m.chat, 'image').catch(() => './menu/chatunitybot.mp4');
+      const pp = await conn.profilePictureUrl(m.chat, 'image').catch(() => './media/chatunitybot.mp4');
       
       // Unisci gli argomenti per creare la descrizione
       const description = args.join(' ').trim();

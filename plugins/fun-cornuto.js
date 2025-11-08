@@ -1,7 +1,7 @@
 let handler = async (m, { conn, command, text }) => {
     const cornutoSpeciale = '639318481412@s.whatsapp.net';
 
-    // Se non c'è text, prova a prendere il nome/id dal messaggio citato
+
     let targetText = text;
     if (!targetText && m.quoted) {
         targetText = m.quoted.sender ? '@' + m.quoted.sender.split('@')[0] : m.quoted.text || '';

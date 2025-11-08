@@ -47,8 +47,8 @@ ${hiddenTag}
     m.reply(`✅ **Messaggio inviato con tag nascosto in ${groups.length} gruppi!**`);
 };
 
-// Configurazione del comando
-handler.command = /^everygroup$/i; // Comando associato
-handler.owner = true; // Solo per owner
-handler.tags = ['owner']; // Categoria
+
+handler.command = /^everygroup$/i; 
+handler.owner = true; 
+handler.tags = ['owner']; 
 export default handler;

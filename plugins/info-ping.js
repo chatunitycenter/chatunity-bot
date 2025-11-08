@@ -11,13 +11,12 @@ let format = sizeFormatter({
 
 let handler = async (m, { conn, usedPrefix, command }) => {
   let nomeDelBot = global.db.data.nomedelbot || `𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲`
-  let versioneBot = '5.2' // Specifica la versione del bot
+  let versioneBot = `${vs}`
   let old = performance.now()
   let neww = performance.now()
-  let speed = (neww - old).toFixed(2) // Limita la velocità a 2 decimali
+  let speed = (neww - old).toFixed(2)
   let uptime = process.uptime() * 1000
 
-  // CPU info
   const cpus = _cpus().map(cpu => {
     cpu.total = Object.keys(cpu.times).reduce((last, type) => last + cpu.times[type], 0)
     return cpu
@@ -46,20 +45,16 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 
   let cpuModel = cpus[0]?.model || 'Unknown Model'
   let cpuSpeed = cpu.speed.toFixed(2)
-  let networkSpeed = 'N/A'
 
-  let caption = `╭━〔🚀𝑺𝑻𝑨𝑻𝐎 𝑺𝑰𝑺𝑻𝑬𝑴𝑨🚀〕━┈⊷
-┃◈╭─────────────·๏
-┃◈┃• ⌛ *Uptime*: ${clockString(uptime)}
-┃◈┃• ⚡ *Ping*: ${speed} ms
-┃◈┃
-┃◈┃• 💻 *CPU*: ${cpuModel}
-┃◈┃• 🔋 *Usage*: ${cpuSpeed} MHz 
-┃◈┃
-┃◈┃• 💾 *RAM*: ${format(totalmem() - freemem())} / ${format(totalmem())}
-┃◈┃• 🟢 *Free*: ${format(freemem())}
-╰━━━━━━━━━━━━━┈·๏
-
+  let caption = `⋆ ★ 🚀 𝑺𝑻𝑨𝑻𝑶 𝑺𝑰𝑺𝑻𝑬𝑴𝑨 🚀 ★ ⋆
+╭♡꒷ ๑ ⋆˚₊⋆───ʚ˚ɞ───⋆˚₊⋆ ๑ ⪩
+୧ ⌛ *Uptime:* ${clockString(uptime)}
+୧ ⚡ *Ping:* ${speed} ms
+  💻 *CPU:* ${cpuModel}
+  🔋 *Usage:* ${cpuSpeed} MHz
+  💾 *RAM:* ${format(totalmem() - freemem())} / ${format(totalmem())}
+  🟢 *Free:* ${format(freemem())}
+╰♡꒷ ๑ ⋆˚₊⋆───ʚ˚ɞ───⋆˚₊⋆ ๑ ⪩
 `
 
   const profilePictureUrl = await fetchProfilePictureUrl(conn, m.sender)
@@ -80,11 +75,11 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     try {
       messageOptions.contextInfo.externalAdReply = {
         title: nomeDelBot,
-        body: `Versione: 7.0`,
+        body: `Versione: ${versioneBot}`,
         mediaType: 1,
         renderLargerThumbnail: false,
         previewType: 'thumbnail',
-        thumbnail: await fetchThumbnail('https://i.ibb.co/PsmK9LGR/9ddcde5b-b8e5-4fd6-bb74-94a0eeab826c.jpg'),
+        thumbnail: await fetchThumbnail('https://i.ibb.co/k22STymH/Immagine-Whats-App-2025-10-23-ore-19-58-44-580b7b7d.jpg-App-2025-10-23-ore-19-58-44-580b7b7d'),
       }
     } catch (error) {
       console.error('Error fetching thumbnail:', error)
@@ -106,19 +101,16 @@ async function fetchProfilePictureUrl(conn, sender) {
     return await conn.profilePictureUrl(sender)
   } catch (error) {
     console.error('Error fetching profile picture URL:', error)
-    return 'default-profile-picture-url' // Fallback URL in case of error
+    return 'default-profile-picture-url'
   }
 }
 
 async function fetchThumbnail(url) {
+  if (!url) return null;
   try {
-    const response = await fetch(url)
-    if (!response.ok) throw new Error(`Failed to fetch thumbnail: ${response.statusText}`)
-    const buffer = await response.buffer()
-    return buffer
-  } catch (error) {
-    console.error('Error fetching thumbnail:', error)
-    return 'default-thumbnail' // Fallback thumbnail in case of error
+      return await global.fetchThumbnail(url);
+  } catch {
+      return null;
   }
 }
 

@@ -24,7 +24,7 @@ let handler = async (m, { conn, isAdmin, isBotAdmin, args, usedPrefix, command }
     }
 
     if (input === '39' || input === '+39') {
-      // accetta tutti con jid che iniziano con '39' o '+39'
+
       const daAccettare = pending.filter(p => p.jid.startsWith('39') || p.jid.startsWith('+39'));
       if (!daAccettare.length) return m.reply("❌ Nessuna richiesta con prefisso +39 trovata.");
       try {
@@ -61,7 +61,7 @@ let handler = async (m, { conn, isAdmin, isBotAdmin, args, usedPrefix, command }
   }
 
   if (args[0] === 'accetta') {
-    // accetta tutte o prime X richieste
+
     const numero = parseInt(args[1]);
     const daAccettare = isNaN(numero) || numero <= 0 ? pending : pending.slice(0, numero);
     try {
