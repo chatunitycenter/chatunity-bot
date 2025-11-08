@@ -46,7 +46,9 @@ pkg install git nodejs ffmpeg imagemagick yarn libcairo pango libjpeg-turbo gifl
 pip install setuptools && \
 export GYP_DEFINES="android_ndk_path=''" && \
 cd ~ && \
-cd /sdcard/chatunity-bot && \
+cd ~/storage/downloads && \
+unzip chatunity-bot-main.zip && \
+cd chatunity-bot-main && \
 yarn install && \
 yarn start
 ```
