@@ -2,7 +2,7 @@
 ---
 
 # **Codice di Condotta**  
-**Versione 5.0**  
+**Versione 8.0**  
 
 ## **Introduzione**  
 Questo Codice di Condotta definisce le aspettative di comportamento per tutti coloro che partecipano alla comunità, al progetto o all'uso del software associato a **[ChatUnity-Bot]**. Il rispetto, l'inclusività e la collaborazione sono i pilastri fondamentali di questa comunità. Ci impegniamo a garantire un ambiente sicuro, accogliente e privo di discriminazioni per tutti.  
