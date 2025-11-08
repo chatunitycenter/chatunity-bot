@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="<a href="https://ibb.co/KxxrgGK0"><img src="https://i.ibb.co/k22STymH/Immagine-Whats-App-2025-10-23-ore-19-58-44-580b7b7d.jpg" alt="Immagine-Whats-App-2025-10-23-ore-19-58-44-580b7b7d" border="0"></a> 
+ <img src="https://i.ibb.co/k22STymH/Immagine-Whats-App-2025-10-23-ore-19-58-44-580b7b7d.jpg" alt="Immagine-Whats-App-2025-10-23-ore-19-58-44-580b7b7d" border="0"></a> 
 </p>
 
 <h1 align="center">© ChatUnity-Bot 8.0 🤖</h1>
@@ -17,20 +17,19 @@
 
 © ChatUnity-Bot è un bot multifunzionale per WhatsApp, progettato per semplificare la gestione delle chat e offrire funzionalità avanzate. Con un'interfaccia intuitiva e una configurazione semplice, è perfetto per chiunque voglia migliorare l'esperienza su WhatsApp.
 
----
-
 ## 📥 Installa Termux & zip bot & MT Manager
 
 <details>
   <summary><b>Clicca qui per vedere i passaggi</b></summary>
 
-👉🏻 [Scarica Termux (MediaFire)](https://www.mediafire.com/file/0npdmv51pnttps0/com.termux_0.119.1-119_minAPI21(arm64-v8a,armeabi-v7a,x86,x86_64)(nodpi)_apkmirror.com.apk/)
-
+👉🏻 [Scarica Termux (MediaFire)](https://www.mediafire.com/file/0npdmv51pnttps0/com.termux_0.119.1-119_minAPI21(arm64-v8a,armeabi-v7a,x86,x86_64)(nodpi)_apkmirror.com.apk/)  
+👉🏻 [Scarica zip bot](https://www.mediafire.com/file/unl57j8kxm7lthd/chatunity-bot-main.zip/file)  
 👉🏻 [Scarica MT Manager](https://mt-manager.en.softonic.com/android)
 
 </details>
 
 ---
+
 
 ## 🚀 Installazione (MT/Zarch)
 
