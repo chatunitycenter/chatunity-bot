@@ -1,4 +1,4 @@
-//Plugins By Gabs
+//Plugins By Gabs, fix Axtral
 import { tmpdir } from 'os';
 import path, { join } from 'path';
 import { readdirSync, statSync, unlinkSync, existsSync, readFileSync, watch } from 'fs';
@@ -304,7 +304,9 @@ async function deletePlugin(pluginName, __dirname, m, conn) {
       message: {
         locationMessage: {
           name: '🗑️ Plugin Eliminato Correttamente',
-          jpegThumbnail: await (await fetch('https://telegra.ph/file/6d491d5823b5778921229.png')).buffer(),
+          jpegThumbnail: Buffer.from(
+            await (await fetch('https://telegra.ph/file/6d491d5823b5778921229.png')).arrayBuffer()
+          ),
           vcard: `BEGIN:VCARD
 VERSION:3.0
 N:;Plugin Manager;;;
