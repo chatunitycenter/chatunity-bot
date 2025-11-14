@@ -42,9 +42,7 @@
 termux-setup-storage && \
 pkg update && pkg upgrade -y && \
 pkg install x11-repo tur-repo -y && \
-pkg install git nodejs ffmpeg imagemagick yarn libcairo pango libjpeg-turbo giflib libpixman pkg-config freetype fontconfig xorgproto build-essential python libvips sqlite clang make chromium binutils -y && \
-pip install setuptools && \
-export GYP_DEFINES="android_ndk_path=''" && \
+pkg install git nodejs ffmpeg imagemagick yarn -y && \
 cd ~ && \
 cd ~/storage/downloads && \
 unzip chatunity-bot-main.zip && \
@@ -64,10 +62,7 @@ yarn start
 ```bash
 termux-setup-storage && \
 pkg update && pkg upgrade -y && \
-pkg install x11-repo tur-repo -y && \
-pkg install git nodejs ffmpeg imagemagick yarn libcairo pango libjpeg-turbo giflib libpixman pkg-config freetype fontconfig xorgproto build-essential python libvips sqlite clang make chromium binutils -y && \
-pip install setuptools && \
-export GYP_DEFINES="android_ndk_path=''" && \
+pkg install git nodejs ffmpeg imagemagick yarn -y && \
 cd ~ && \
 git clone https://github.com/chatunitycenter/chatunity-bot.git && \
 cd chatunity-bot && \

@@ -38,7 +38,6 @@
     "archiver": "^7.0.1",
     "awesome-phonenumber": "^3.4.0",
     "axios": "^1.7.9",
-    "canvas": "^3.1.0",
     "cfonts": "^2.10.0",
     "chalk": "^5.4.1",
     "cheerio": "1.0.0-rc.12",
