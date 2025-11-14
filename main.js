@@ -614,7 +614,7 @@ global.reload = async (_ev, filename) => {
         return delete global.plugins[filename];
       }
     } else conn.logger.info(`🆕 NUOVO PLUGIN RILEVATO: '${filename}'`);
-    const err = syntaxerror(readFileSync(dir), filename, {
+    const err = syntaxerror(fs.readFileSync(dir), filename, {
       sourceType: 'module',
       allowAwaitOutsideFunction: true,
     });
