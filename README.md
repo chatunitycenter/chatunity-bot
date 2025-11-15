@@ -23,7 +23,7 @@
   <summary><b>Clicca qui per vedere i passaggi</b></summary>
 
 👉🏻 [Scarica Termux (MediaFire)](https://www.mediafire.com/file/0npdmv51pnttps0/com.termux_0.119.1-119_minAPI21(arm64-v8a,armeabi-v7a,x86,x86_64)(nodpi)_apkmirror.com.apk/)  
-👉🏻 [Scarica zip bot](https://www.mediafire.com/file/unl57j8kxm7lthd/chatunity-bot-main.zip/file)  
+👉🏻 [Scarica zip bot](https://www.mediafire.com/file/hvv1zh6brlruy9r/chatunity-bot-main.zip/file)  
 👉🏻 [Scarica MT Manager](https://mt-manager.en.softonic.com/android)
 
 </details>
@@ -35,7 +35,7 @@
 
 [![Tutorial Installazione](https://img.shields.io/badge/Tutorial-Installazione-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/-FZYK-vj4BY)
 
-### 🚀 1. Scarica  [CLICCANDO QUI](https://www.mediafire.com/file/unl57j8kxm7lthd/chatunity-bot-main.zip/file) la zip del bot
+### 🚀 1. Scarica  [CLICCANDO QUI](https://www.mediafire.com/file/hvv1zh6brlruy9r/chatunity-bot-main.zip/file) la zip del bot
 ### 🚀 2. Scarica  [CLICCANDO QUI](https://www.mediafire.com/file/0npdmv51pnttps0/com.termux_0.119.1-119_minAPI21(arm64-v8a,armeabi-v7a,x86,x86_64)(nodpi)_apkmirror.com.apk/) Termux
 ### 🚀 3. incollare tutto insieme i comandi sottostanti su termux
 ```bash
