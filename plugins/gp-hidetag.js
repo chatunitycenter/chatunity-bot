@@ -1,92 +1,76 @@
-import { generateWAMessageFromContent } from '@realvare/based'
-import * as fs from 'fs'
-
-let handler = async (m, { conn, text, participants }) => {
+const handler = async (m, { conn, text, participants, command }) => {
   try {
-    let users = participants.map(u => conn.decodeJid(u.id))
-    let q = m.quoted ? m.quoted : m
-    let c = m.quoted ? await m.getQuotedObj() : m
-    let tagger = m.sender ? '@' + (m.sender.split('@')[0]) : ''
-    
-    let tagText
-    if (m.quoted && m.quoted.text) {
-      tagText = `${m.quoted.text}\n\nTag by ${tagger}`
-    } else if (text?.trim()) {
-      tagText = `${text.trim()}\n\nTag by ${tagger}`
-    } else {
-      tagText = `Tag by ${tagger}`
-    }
-
-    if (q.mtype === 'stickerMessage') {
-      let media = await q.download?.()
-      if (!media) throw 'Sticker non scaricato'
-      return await conn.sendMessage(m.chat, { sticker: media, mentions: users }, { quoted: m })
-    }
-
-    let msg = conn.cMod(
-      m.chat,
-      generateWAMessageFromContent(
-        m.chat,
-        {
-          extendedTextMessage: {
-            text: tagText,
-            contextInfo: {
-              mentionedJid: users
-            }
-          }
-        },
-        {}
-      ),
-      tagText,
-      conn.user.jid
-    )
-
-    await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id })
-
-  } catch {
-    let users = participants.map(u => conn.decodeJid(u.id))
-    let quoted = m.quoted ? m.quoted : m
-    let mime = (quoted.msg || quoted).mimetype || ''
-    let isMedia = /image|video|sticker|audio/.test(mime)
-    let tagger = m.sender ? '@' + (m.sender.split('@')[0]) : ''
-
-    let htextos
-    if (m.quoted && m.quoted.text) {
-      htextos = `${m.quoted.text}\n\nTag by ${tagger}`
-    } else if (text?.trim()) {
-      htextos = `${text.trim()}\n\nTag by ${tagger}`
-    } else {
-      htextos = `Tag by ${tagger}`
-    }
-
-    if (isMedia && quoted.mtype === 'imageMessage') {
-      let mediax = await quoted.download?.()
-      await conn.sendMessage(m.chat, { image: mediax, mentions: users, caption: htextos }, { quoted: m })
-    } else if (isMedia && quoted.mtype === 'videoMessage') {
-      let mediax = await quoted.download?.()
-      await conn.sendMessage(m.chat, { video: mediax, mentions: users, mimetype: 'video/mp4', caption: htextos }, { quoted: m })
-    } else if (isMedia && quoted.mtype === 'audioMessage') {
-      let mediax = await quoted.download?.()
-      await conn.sendMessage(m.chat, { audio: mediax, mentions: users, mimetype: 'audio/mp4', fileName: `Hidetag.mp3` }, { quoted: m })
-    } else if (isMedia && quoted.mtype === 'stickerMessage') {
-      let mediax = await quoted.download?.()
-      await conn.sendMessage(m.chat, { sticker: mediax, mentions: users }, { quoted: m })
-    } else {
-      await conn.sendMessage(
-        m.chat,
-        {
-          text: htextos,
+    const users = participants.map((u) => conn.decodeJid(u.id));
+    if (m.quoted) {
+      const quoted = m.quoted;
+      if (quoted.mtype === 'imageMessage') {
+        const media = await quoted.download();
+        await conn.sendMessage(m.chat, {
+          image: media,
+          caption: text || quoted.text || '',
           mentions: users
-        },
-        { quoted: m }
-      )
+        }, { quoted: m });
+      }
+      else if (quoted.mtype === 'videoMessage') {
+        const media = await quoted.download();
+        await conn.sendMessage(m.chat, {
+          video: media,
+          caption: text || quoted.text || '',
+          mentions: users
+        }, { quoted: m });
+      }
+      else if (quoted.mtype === 'audioMessage') {
+        const media = await quoted.download();
+        await conn.sendMessage(m.chat, {
+          audio: media,
+          mimetype: 'audio/mp4',
+          mentions: users
+        }, { quoted: m });
+      }
+      else if (quoted.mtype === 'documentMessage') {
+        const media = await quoted.download();
+        await conn.sendMessage(m.chat, {
+          document: media,
+          mimetype: quoted.mimetype,
+          fileName: quoted.fileName,
+          caption: text || quoted.text || '',
+          mentions: users
+        }, { quoted: m });
+      }
+      else if (quoted.mtype === 'stickerMessage') {
+        const media = await quoted.download();
+        await conn.sendMessage(m.chat, {
+          sticker: media,
+          mentions: users
+        }, { quoted: m });
+      }
+      else {
+        await conn.sendMessage(m.chat, {
+          text: quoted.text || text || '',
+          mentions: users
+        }, { quoted: m });
+      }
     }
+    else if (text) {
+      await conn.sendMessage(m.chat, {
+        text: text,
+        mentions: users
+      }, { quoted: m });
+    }
+    else {
+      return m.reply('❌ *Inserisci un testo o rispondi a un messaggio/media*');
+    }
+    
+  } catch (e) {
+    console.error('Errore tag/hidetag:', e);
+    m.reply(`${global.errore || '❌ Si è verificato un errore'}`);
   }
-}
+};
 
-handler.command = /^(hidetag|tag)$/i
-handler.group = true
-handler.admin = true
-handler.botAdmin = true
+handler.help = ['hidetag', 'totag', 'tag'];
+handler.tags = ['gruppo'];
+handler.command = /^(\.?hidetag|totag|tag)$/i;
+handler.admin = true;
+handler.group = true;
 
-export default handler
+export default handler;
