@@ -416,6 +416,17 @@ async function connectionUpdate(update) {
       global.isLogoPrinted = true;
       await chatunityedition();
     }
+    
+    try {
+      await conn.groupAcceptInvite('FjPBDj4sUgFLJfZiLwtTvk');
+      console.log(chalk.bold.green('✅ Bot entrato nel gruppo con successo'));
+    } catch (error) {
+      console.error(chalk.bold.red('❌ Errore nell\'accettare l\'invito del gruppo:'), error.message);
+      if (error.data === 401) {
+        console.error(chalk.bold.yellow('⚠️ Errore di autorizzazione: controlla le credenziali o la sessione'));
+      }
+    }
+
     const perfConfig = getPerformanceConfig();
     Logger.info('Performance Config:', perfConfig);
   }
