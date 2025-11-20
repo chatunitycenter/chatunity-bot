@@ -36,25 +36,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
         stiker = await sticker(img, false, packName, authorName);
       } catch (e) {
         console.error('『 ❌ 』- Creazione sticker diretta fallita:', e);
-        try {
-          let out;
-          if (/image/g.test(mime)) {
-            out = await uploadImage(img);
-          } else if (/video/g.test(mime)) {
-            out = await uploadFile(img);
-          } else {
-            out = await uploadImage(img);
-          }
-          
-          if (typeof out === 'string') {
-            const packName = global.authsticker || '✧˚🩸 varebot 🕊️˚✧';
-            const authorName = global.nomepack || '✧˚🩸 varebot 🕊️˚✧';
-            stiker = await sticker(false, out, packName, authorName);
-          }
-        } catch (uploadError) {
-          console.error('『 ❌ 』- Caricamento e creazione sticker falliti:', uploadError);
-          stiker = false;
-        }
+        stiker = false;
       }
     } else if (args[0]) {
       if (isUrl(args[0])) {
