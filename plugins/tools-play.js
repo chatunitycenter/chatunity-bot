@@ -213,7 +213,12 @@ let handler = async (m, { conn, command, text, usedprefix }) => {
                         name: 'cta_copy',
                         buttonParamsJson: JSON.stringify({
                             display_text: '📎 Copia link',
-                            copy_code: video.url})}]}});
+                            copy_code: video.url
+                        })
+                    }
+                ]
+            };
+        });
 
         const cards = await Promise.all(cardsPromises);
 
@@ -231,8 +236,6 @@ let handler = async (m, { conn, command, text, usedprefix }) => {
             const shortTitle = video.title.substring(0, 20) + (video.title.length > 20 ? '...' : '');
             return [shortTitle, `${prefix}playaudio ${video.url}`];
         });
-
-        const firstThumbnail = searchResults[0].thumbnail || `https://img.youtube.com/vi/${searchResults[0].videoId}/maxresdefault.jpg`;
 
         await conn.sendButton(
             m.chat,
@@ -404,12 +407,9 @@ setInterval(() => {
     }
 }, 3 * 60 * 1000);
 
-handler.help = ['play <nome/url>', 'playaudio <nome/url>', 'playvideo <nome/url>'];
-handler.tags = ['download'];
-handler.command = ['play', 'playaudio', 'playvideo'];
-handler.register = true;
-export default handler;
-handler.command = handler.help = ['play', 'playaudio', 'playvideo', 'ytmp4', 'play2'];
+handler.help = ['play', 'playaudio', 'playvideo', 'ytmp4', 'play2'];
 handler.tags = ['downloader'];
+handler.command = ['play', 'playaudio', 'playvideo', 'ytmp4', 'play2'];
+handler.register = true;
 
 export default handler;
