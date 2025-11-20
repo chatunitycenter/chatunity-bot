@@ -76,7 +76,7 @@
     "twemoji": "^14.0.2",
     "url-regex-safe": "^3.0.0",
     "yargs": "^17.3.1",
-    "yt-search": "^2.10.3"
+    "yt-search": "^2.10.3",
     "youtube-dl-exec": "^3.0.25",
   },
   "devDependencies": {
