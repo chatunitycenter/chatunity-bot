@@ -1,7 +1,6 @@
 import uploadFile from '../lib/uploadFile.js';
 import uploadImage from '../lib/uploadImage.js';
 import { Sticker, StickerTypes } from 'wa-sticker-formatter';
-import fetch from 'node-fetch';
 
 let handler = async (m, { conn, args, usedPrefix, command }) => {
   let stiker = false;
@@ -26,14 +25,14 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
         const imgBuffer = Buffer.isBuffer(img) ? img : Buffer.from(img);
         
         // Crea lo sticker usando wa-sticker-formatter
-        const sticker = new Sticker(imgBuffer, {
+        const stickerObj = new Sticker(imgBuffer, {
           pack: packName,
           author: authorName,
           type: StickerTypes.FULL,
           quality: 50
         });
         
-        stiker = await sticker.toBuffer();
+        stiker = await stickerObj.toBuffer();
       } catch (e) {
         console.error('『 ❌ 』- Creazione sticker diretta fallita:', e);
         try {
@@ -52,16 +51,17 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
             
             // Scarica l'immagine dall'URL
             const response = await fetch(out);
-            const buffer = await response.buffer();
+            const arrayBuffer = await response.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
             
-            const sticker = new Sticker(buffer, {
+            const stickerObj = new Sticker(buffer, {
               pack: packName,
               author: authorName,
               type: StickerTypes.FULL,
               quality: 50
             });
             
-            stiker = await sticker.toBuffer();
+            stiker = await stickerObj.toBuffer();
           }
         } catch (uploadError) {
           console.error('『 ❌ 』- Caricamento e creazione sticker falliti:', uploadError);
@@ -76,16 +76,17 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
           
           // Scarica l'immagine dall'URL
           const response = await fetch(args[0]);
-          const buffer = await response.buffer();
+          const arrayBuffer = await response.arrayBuffer();
+          const buffer = Buffer.from(arrayBuffer);
           
-          const sticker = new Sticker(buffer, {
+          const stickerObj = new Sticker(buffer, {
             pack: packName,
             author: authorName,
             type: StickerTypes.FULL,
             quality: 50
           });
           
-          stiker = await sticker.toBuffer();
+          stiker = await stickerObj.toBuffer();
         } catch (urlError) {
           console.error('『 ❌ 』- Errore download URL:', urlError);
           return m.reply('『 🔗 』- `Errore nel download dell\'immagine dall\'URL. Verifica che il link sia valido.`');
@@ -133,8 +134,3 @@ const isUrl = (text) => {
     )
   );
 };
-
-export default handler
-
-const isUrl = (text) => {
-return text.match(new RegExp(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)(jpe?g|gif|png)/, 'gi'))}
