@@ -1,6 +1,6 @@
+import { sticker } from '../lib/sticker.js';
 import uploadFile from '../lib/uploadFile.js';
 import uploadImage from '../lib/uploadImage.js';
-import { Sticker, StickerTypes } from 'wa-sticker-formatter';
 
 let handler = async (m, { conn, args, usedPrefix, command }) => {
   let stiker = false;
@@ -21,18 +21,19 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
         const packName = global.authsticker || '✧˚🩸 varebot 🕊️˚✧';
         const authorName = global.nomepack || '✧˚🩸 varebot 🕊️˚✧';
         
-        // Converti in Buffer se necessario
-        const imgBuffer = Buffer.isBuffer(img) ? img : Buffer.from(img);
+        if (!global.support) {
+          global.support = {
+            ffmpeg: true,
+            ffprobe: true,
+            ffmpegWebp: true,
+            convert: true,
+            magick: false,
+            gm: false,
+            find: false
+          };
+        }
         
-        // Crea lo sticker usando wa-sticker-formatter
-        const stickerObj = new Sticker(imgBuffer, {
-          pack: packName,
-          author: authorName,
-          type: StickerTypes.FULL,
-          quality: 50
-        });
-        
-        stiker = await stickerObj.toBuffer();
+        stiker = await sticker(img, false, packName, authorName);
       } catch (e) {
         console.error('『 ❌ 』- Creazione sticker diretta fallita:', e);
         try {
@@ -48,20 +49,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
           if (typeof out === 'string') {
             const packName = global.authsticker || '✧˚🩸 varebot 🕊️˚✧';
             const authorName = global.nomepack || '✧˚🩸 varebot 🕊️˚✧';
-            
-            // Scarica l'immagine dall'URL
-            const response = await fetch(out);
-            const arrayBuffer = await response.arrayBuffer();
-            const buffer = Buffer.from(arrayBuffer);
-            
-            const stickerObj = new Sticker(buffer, {
-              pack: packName,
-              author: authorName,
-              type: StickerTypes.FULL,
-              quality: 50
-            });
-            
-            stiker = await stickerObj.toBuffer();
+            stiker = await sticker(false, out, packName, authorName);
           }
         } catch (uploadError) {
           console.error('『 ❌ 』- Caricamento e creazione sticker falliti:', uploadError);
@@ -70,27 +58,22 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
       }
     } else if (args[0]) {
       if (isUrl(args[0])) {
-        try {
-          const packName = global.authsticker || '✧˚🩸 varebot 🕊️˚✧';
-          const authorName = global.nomepack || '✧˚🩸 varebot 🕊️˚✧';
-          
-          // Scarica l'immagine dall'URL
-          const response = await fetch(args[0]);
-          const arrayBuffer = await response.arrayBuffer();
-          const buffer = Buffer.from(arrayBuffer);
-          
-          const stickerObj = new Sticker(buffer, {
-            pack: packName,
-            author: authorName,
-            type: StickerTypes.FULL,
-            quality: 50
-          });
-          
-          stiker = await stickerObj.toBuffer();
-        } catch (urlError) {
-          console.error('『 ❌ 』- Errore download URL:', urlError);
-          return m.reply('『 🔗 』- `Errore nel download dell\'immagine dall\'URL. Verifica che il link sia valido.`');
+        const packName = global.authsticker || '✧˚🩸 varebot 🕊️˚✧';
+        const authorName = global.nomepack || '✧˚🩸 varebot 🕊️˚✧';
+        
+        if (!global.support) {
+          global.support = {
+            ffmpeg: true,
+            ffprobe: true,
+            ffmpegWebp: true,
+            convert: true,
+            magick: false,
+            gm: false,
+            find: false
+          };
         }
+        
+        stiker = await sticker(false, args[0], packName, authorName);
       } else {
         return m.reply('『 🔗 』- `L\'URL fornito non è valido. Assicurati che sia un link diretto a un\'immagine.`');
       }
