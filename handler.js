@@ -582,7 +582,8 @@ export async function participantsUpdate({ id, participants, action }) {
                                     "previewType": "PHOTO", 
                                     "thumbnailUrl": ``, 
                                     "thumbnail": apii.data,
-                                    "mediaType": 1
+                                    "mediaType": 1,
+                                    "renderLargerThumbnail": false
                                 }
                             }
                         }) 
