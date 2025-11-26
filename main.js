@@ -119,7 +119,8 @@ const {
   clearCache,
   Logger,
   makeInMemoryStore
-} = await import('@realvare/based')[web:7]; // solo import, niente uso diretto
+} = await import('@realvare/based');
+
 
 const { chain } = lodash;
 const PORT = process.env.PORT || process.env.SERVER_PORT || 3000;
