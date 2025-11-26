@@ -3,7 +3,15 @@ import { createRequire } from 'module';
 import path, { join } from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 import { platform } from 'process';
-import fs, { readdirSync, statSync, unlinkSync, existsSync, mkdirSync, rmSync, watch } from 'fs';
+import fs, {
+  readdirSync,
+  statSync,
+  unlinkSync,
+  existsSync,
+  mkdirSync,
+  rmSync,
+  watch
+} from 'fs';
 import yargs from 'yargs';
 import { spawn } from 'child_process';
 import lodash from 'lodash';
@@ -40,7 +48,9 @@ function clearSessionFolderSelective(dir = sessionFolder) {
       }
     }
   }
-  console.log(`Cartella sessioni pulita (file non critici rimossi): ${new Date().toLocaleTimeString()}`);
+  console.log(
+    `Cartella sessioni pulita (file non critici rimossi): ${new Date().toLocaleTimeString()}`
+  );
 }
 
 function purgeSession(sessionDir, cleanPreKeys = false) {
@@ -76,10 +86,12 @@ setInterval(async () => {
 
 setInterval(async () => {
   if (stopped === 'close' || !conn || !conn.user) return;
-  purgeSession(`./sessioni`);
+  purgeSession('./sessioni');
   const subBotDir = `./${global.authFileJB}`;
   if (existsSync(subBotDir)) {
-    const subBotFolders = readdirSync(subBotDir).filter(file => statSync(join(subBotDir, file)).isDirectory());
+    const subBotFolders = readdirSync(subBotDir).filter(file =>
+      statSync(join(subBotDir, file)).isDirectory()
+    );
     subBotFolders.forEach(folder => purgeSession(join(subBotDir, folder)));
   }
 }, 3 * 60 * 1000);
@@ -89,7 +101,9 @@ setInterval(async () => {
   purgeSession(`./${global.authFile}`, true);
   const subBotDir = `./${global.authFileJB}`;
   if (existsSync(subBotDir)) {
-    const subBotFolders = readdirSync(subBotDir).filter(file => statSync(join(subBotDir, file)).isDirectory());
+    const subBotFolders = readdirSync(subBotDir).filter(file =>
+      statSync(join(subBotDir, file)).isDirectory()
+    );
     subBotFolders.forEach(folder => purgeSession(join(subBotDir, folder), true));
   }
 }, 3 * 60 * 60 * 1000);
@@ -113,14 +127,8 @@ const {
   makeCacheableSignalKeyStore,
   Browsers,
   jidNormalizedUser,
-  getPerformanceConfig,
-  setPerformanceConfig,
-  getCacheStats,
-  clearCache,
-  Logger,
   makeInMemoryStore
-} = await import('@realvare/based');
-
+} = await import('@realvare/based'); [web:7]
 
 const { chain } = lodash;
 const PORT = process.env.PORT || process.env.SERVER_PORT || 3000;
@@ -146,7 +154,11 @@ function redefineConsoleMethod(methodName, filterStrings) {
 }
 
 global.__filename = function filename(pathURL = import.meta.url, rmPrefix = platform !== 'win32') {
-  return rmPrefix ? (/file:\/\/\//.test(pathURL) ? fileURLToPath(pathURL) : pathURL) : pathToFileURL(pathURL).toString();
+  return rmPrefix
+    ? /file:\/\/\//.test(pathURL)
+      ? fileURLToPath(pathURL)
+      : pathURL
+    : pathToFileURL(pathURL).toString();
 };
 
 global.__dirname = function dirname(pathURL) {
@@ -177,8 +189,7 @@ const __dirname = global.__dirname(import.meta.url);
 global.opts = new Object(yargs(process.argv.slice(2)).exitProcess(false).parse());
 global.prefix = new RegExp(
   '^[' +
-    (opts['prefix'] || '*/!#$%+£¢€¥^°=¶∆×÷π√✓©®&.\\-.@')
-      .replace(/[|\\{}()[\]^$+*.\-\^]/g, '\\$&') +
+    (opts['prefix'] || '*/!#$%+£¢€¥^°=¶∆×÷π√✓©®&.\\-.@').replace(/[|\\{}()[\]^$+*.\-\^]/g, '\\$&') +
     ']'
 );
 
@@ -226,8 +237,6 @@ if (global.conns instanceof Array) {
 global.creds = 'creds.json';
 global.authFile = 'sessioni';
 global.authFileJB = 'chatunity-sub';
-
-// RIMOSSA qualsiasi riga con process.env['NODE_TLS_REJECT_UNAUTHORIZED']
 
 const { state, saveCreds } = await useMultiFileAuthState(global.authFile);
 const msgRetryCounterMap = MessageRetryMap => {};
@@ -405,9 +414,7 @@ if (!fs.existsSync(`./${authFile}/creds.json`)) {
         let codeBot = await conn.requestPairingCode(addNumber, 'unitybot');
         codeBot = codeBot?.match(/.{1,4}/g)?.join('-') || codeBot;
         console.log(
-          chalk.bold.white(
-            chalk.bgBlueBright('꒰🩸꒱ ◦•≫ CODICE DI COLLEGAMENTO:'
-          )),
+          chalk.bold.white(chalk.bgBlueBright('꒰🩸꒱ ◦•≫ CODICE DI COLLEGAMENTO:')),
           chalk.bold.white(chalk.white(codeBot))
         );
       }, 3000);
@@ -493,8 +500,6 @@ async function connectionUpdate(update) {
         );
       }
     }
-
-    // RIMOSSA la parte che chiamava getPerformanceConfig / Logger.info
   }
 
   if (connection === 'close') {
@@ -676,7 +681,7 @@ async function connectSubBots() {
     await connectSubBots();
   } catch (error) {
     console.error(
-      chalk.bold.bgRedBright('🥀 Errore nell\'avvio del bot: ', error)
+      chalk.bold.bgRedBright("🥀 Errore nell'avvio del bot: ", error)
     );
   }
 })();
@@ -723,7 +728,7 @@ global.reloadHandler = async function (restatConn) {
   conn.participantsUpdate = handler.participantsUpdate.bind(global.conn);
   conn.groupsUpdate = handler.groupsUpdate.bind(global.conn);
   conn.onDelete = handler.deleteUpdate.bind(global.conn);
-  conn.onCall = handler.callUpdate.bind(global.conn);
+  conn.onCall = handler.callUpdate.bind	global.conn);
   conn.connectionUpdate = connectionUpdate.bind(global.conn);
   conn.credsUpdate = saveCreds.bind(global.conn, true);
 
@@ -815,18 +820,16 @@ async function _quickTest() {
       spawn('magick'),
       spawn('gm'),
       spawn('find', ['--version'])
-    ].map(p => {
-      return Promise.race([
+    ].map(p =>
+      Promise.race([
         new Promise(resolve => {
-          p.on('close', code => {
-            resolve(code !== 127);
-          });
+          p.on('close', code => resolve(code !== 127));
         }),
         new Promise(resolve => {
           p.on('error', _ => resolve(false));
         })
-      ]);
-    })
+      ])
+    )
   );
   const [ffmpeg, ffprobe, ffmpegWebp, convert, magick, gm, findBin] = test;
   const s = (global.support = { ffmpeg, ffprobe, ffmpegWebp, convert, magick, gm, find: findBin });
@@ -867,7 +870,7 @@ function ripristinaTimer(connLocal) {
   }, 1000 * 60 * 30);
 }
 
-_quickTest().then(() => conn.logger.info(chalk.bold.bgBlueBright(``)));
+_quickTest().then(() => conn.logger.info(chalk.bold.bgBlueBright('')));
 let filePath = fileURLToPath(import.meta.url);
 const mainWatcher = watch(filePath, async () => {
   console.log(chalk.bold.bgBlueBright('Main Aggiornato'));
