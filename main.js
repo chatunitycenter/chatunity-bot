@@ -128,7 +128,7 @@ const {
   Browsers,
   jidNormalizedUser,
   makeInMemoryStore
-} = await import('@realvare/based'); [web:7]
+} = await import('@realvare/based');
 
 const { chain } = lodash;
 const PORT = process.env.PORT || process.env.SERVER_PORT || 3000;
