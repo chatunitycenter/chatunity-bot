@@ -8,7 +8,7 @@ global.confirmCode = '';
 global.nomebot = '𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲-𝐁𝐨𝐭';
 global.packname = '𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲-𝐁𝐨𝐭';
 global.author = '𝐌𝐝';
-global.vs = '8.3';
+global.vs = '8.4';
 global.collab = 'Demon Slayer';
 global.wm = global.nomebot;
 global.wait = 'ⓘ 𝐂𝐚𝐫𝐢𝐜𝐚𝐦𝐞𝐧𝐭𝐨 ...';
@@ -16,8 +16,7 @@ global.wait = 'ⓘ 𝐂𝐚𝐫𝐢𝐜𝐚𝐦𝐞𝐧𝐭𝐨 ...';
 
 global.owner = [
   ['393773842461', '𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲', true],
-  ['393512884684', 'Axtral', true],
-  ['xxxxxxxxxx'],
+  ['xxxxxxxxxx'], //mettete il vostro numero al posto delle x e copiate sopra il formato dopo ovvero 'nome', true
   ['xxxxxxxxxx'],
   ['xxxxxxxxxx'],
   ['xxxxxxxxxx'],
