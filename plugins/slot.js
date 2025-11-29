@@ -22,7 +22,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
     let win = Math.random() < 0.5
     let resultMsg, gifFile
 
-    // Calcola informazioni livello e XP
+
     user.exp = Number(user.exp) || 0
     user.level = Number(user.level) || 1
     let { min: minXP, xp: levelXP, max: maxXP } = xpRange(user.level, global.multiplier || 1)
@@ -36,7 +36,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
         resultMsg += '│ ➕ *800 UC*\n'
         resultMsg += '│ ➕ *100 XP*\n'
         resultMsg += '└──────────────\n'
-        gifFile = './icone/perdita.gif'  // Cambiato in GIF
+        gifFile = './media/perdita.gif'  // Cambiato in GIF
     } else {
         user.limit = (user.limit || 0) - bet
         user.exp = Math.max(0, (user.exp || 0) - bet)
@@ -45,10 +45,10 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
         resultMsg += '│ ➖ *' + bet + ' UC*\n'
         resultMsg += '│ ➖ *' + bet + ' XP*\n'
         resultMsg += '└──────────────\n'
-        gifFile = './icone/vincita.gif'  // Cambiato in GIF
+        gifFile = './media/vincita.gif'  // Cambiato in GIF
     }
 
-    // Aggiungi informazioni saldo attuale
+
     resultMsg += '\n💎 *SALDO ATTUALE*\n'
     resultMsg += '┌──────────────\n'
     resultMsg += '│ 👛 *UC: ' + (user.limit || 0) + '*\n'
@@ -76,7 +76,7 @@ handler.command = ['slot']
 
 export default handler
 
-// Funzione xpRange dal tuo codice di esempio
+
 function xpRange(level, multiplier = 1) {
     if(level < 0) level = 0
     let min = level === 0 ? 0 : Math.pow(level, 2) * 20
