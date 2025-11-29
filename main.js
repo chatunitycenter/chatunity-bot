@@ -121,6 +121,15 @@ let methodCode = process.argv.includes("code");
 let MethodMobile = process.argv.includes("mobile");
 let phoneNumber = global.botNumberCode;
 
+function generateRandomCode(length = 8) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
 function redefineConsoleMethod(methodName, filterStrings) {
   const originalConsoleMethod = console[methodName];
   console[methodName] = function () {
@@ -186,17 +195,6 @@ if (global.conns instanceof Array) {
 global.creds = 'creds.json';
 global.authFile = 'sessioni';
 global.authFileJB = 'chatunity-sub';
-
-setPerformanceConfig({
-  performance: {
-    enableCache: true,
-    enableMetrics: true
-  },
-  debug: {
-    enableLidLogging: true,
-    logLevel: 'silent'
-  }
-});
 
 const { state, saveCreds } = await useMultiFileAuthState(global.authFile);
 const msgRetryCounterMap = (MessageRetryMap) => { };
@@ -307,7 +305,7 @@ const connectionOptions = {
   defaultQueryTimeoutMs: 60000,
   connectTimeoutMs: 60000,
   keepAliveIntervalMs: 10000,
-  printQRInTerminal: true,
+  printQRInTerminal: opzione === '1' || methodCodeQR,
   cachedGroupMetadata: async (jid) => {
     const cached = global.groupCache.get(jid);
     if (cached) return cached;
@@ -354,7 +352,8 @@ if (!fs.existsSync(`./${authFile}/creds.json`)) {
         rl.close();
       }
       setTimeout(async () => {
-        let codeBot = await conn.requestPairingCode(addNumber, 'un1tyb0t');
+        const randomCode = generateRandomCode();
+        let codeBot = await conn.requestPairingCode(addNumber, randomCode);
         codeBot = codeBot?.match(/.{1,4}/g)?.join("-") || codeBot;
         console.log(chalk.bold.white(chalk.bgBlueBright('꒰🩸꒱ ◦•≫ CODICE DI COLLEGAMENTO:')), chalk.bold.white(chalk.white(codeBot)));
       }, 3000);
