@@ -31,7 +31,7 @@
 ---
 
 
-## 🚀 Installazione termux (senza zip)
+## 🚀 Installazione termux senza zip (consigliato)
 
 [![Tutorial Installazione](https://img.shields.io/badge/Tutorial-Installazione-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/-FZYK-vj4BY)
 ### 🚀 1. Scarica  [CLICCANDO QUI](https://www.mediafire.com/file/0npdmv51pnttps0/com.termux_0.119.1-119_minAPI21(arm64-v8a,armeabi-v7a,x86,x86_64)(nodpi)_apkmirror.com.apk/) Termux
@@ -47,7 +47,7 @@ yarn install && \
 yarn start
 ```
 
-## 🚀 Installazione termux (con zip)
+## 🚀 Installazione termux con zip (per developers)
 
 [![Tutorial Installazione](https://img.shields.io/badge/Tutorial-Installazione-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/-FZYK-vj4BY)
 
