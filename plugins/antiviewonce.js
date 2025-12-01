@@ -1,6 +1,6 @@
 
 
-import { downloadContentFromMessage } from "@realvare/based"
+import { downloadContentFromMessage } from "@whiskeysockets/baileys"
 
 export async function before(m, { isAdmin, isBotAdmin }) {
 let chat = db.data.chats[m.chat]

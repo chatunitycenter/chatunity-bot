@@ -1,4 +1,4 @@
-import { downloadContentFromMessage } from '@realvare/based'
+import { downloadContentFromMessage } from '@whiskeysockets/baileys'
 
 let handler = async (m, { conn }) => {
     try {
