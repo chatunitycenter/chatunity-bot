@@ -83,7 +83,7 @@ setInterval(async () => {
     const subBotFolders = readdirSync(subBotDir).filter(file => statSync(join(subBotDir, file)).isDirectory());
     subBotFolders.forEach(folder => purgeSession(join(subBotDir, folder)));
   }
-}, 3 * 60 * 1000);
+}, 20 * 60 * 1000);
 
 setInterval(async () => {
   if (stopped === 'close' || !conn || !conn.user) return;
