@@ -19,6 +19,15 @@ import readline from 'readline';
 import NodeCache from 'node-cache';
 
 const sessionFolder = path.join(process.cwd(), global.authFile || 'sessioni');
+const tempDir = join(process.cwd(), 'temp');
+const tmpDir = join(process.cwd(), 'tmp');
+
+if (!existsSync(tempDir)) {
+  mkdirSync(tempDir, { recursive: true });
+}
+if (!existsSync(tmpDir)) {
+  mkdirSync(tmpDir, { recursive: true });
+}
 
 function clearSessionFolderSelective(dir = sessionFolder) {
   if (!fs.existsSync(dir)) {
@@ -95,20 +104,7 @@ setInterval(async () => {
   }
 }, 3 * 60 * 60 * 1000);
 
-const DisconnectReason = {
-  connectionClosed: 428,
-  connectionLost: 408,
-  connectionReplaced: 440,
-  timedOut: 408,
-  loggedOut: 401,
-  badSession: 500,
-  restartRequired: 515,
-  multideviceMismatch: 411,
-  forbidden: 403,
-  unavailableService: 503
-};
-
-const { useMultiFileAuthState, fetchLatestBaileysVersion, makeCacheableSignalKeyStore, Browsers, jidNormalizedUser, setPerformanceConfig, getCacheStats, clearCache, Logger, makeInMemoryStore } = await import('@whiskeysockets/baileys');
+const { useMultiFileAuthState, fetchLatestBaileysVersion, makeCacheableSignalKeyStore, Browsers, jidNormalizedUser, makeInMemoryStore, DisconnectReason } = await import('@whiskeysockets/baileys');
 const { chain } = lodash;
 const PORT = process.env.PORT || process.env.SERVER_PORT || 3000;
 protoType();
@@ -272,11 +268,46 @@ global.store = makeInMemoryStore({ logger });
 
 const connectionOptions = {
   logger: logger,
+  printQRInTerminal: opzione === '1' || methodCodeQR,
   mobile: MethodMobile,
-  browser: opzione === '1' ? Browsers.windows('Chrome') : methodCodeQR ? Browsers.windows('Chrome') : Browsers.macOS('Safari'),
   auth: {
     creds: state.creds,
     keys: makeCacheableSignalKeyStore(state.keys, logger),
+  },
+  browser: opzione === '1' ? Browsers.windows('Chrome') : methodCodeQR ? Browsers.windows('Chrome') : Browsers.macOS('Safari'),
+  version: version,
+  markOnlineOnConnect: true,
+  generateHighQualityLinkPreview: true,
+  syncFullHistory: false,
+  linkPreviewImageThumbnailWidth: 192,
+  getMessage: async (key) => {
+    try {
+      const jid = global.conn.decodeJid(key.remoteJid);
+      const msg = await global.store.loadMessage(jid, key.id);
+      return msg?.message || undefined;
+    } catch (error) {
+      return undefined;
+    }
+  },
+  defaultQueryTimeoutMs: 60000,
+  connectTimeoutMs: 60000,
+  keepAliveIntervalMs: 30000,
+  emitOwnEvents: true,
+  fireInitQueries: true,
+  transactionOpts: {
+    maxCommitRetries: 10,
+    delayBetweenTriesMs: 3000
+  },
+  cachedGroupMetadata: async (jid) => {
+    const cached = global.groupCache.get(jid);
+    if (cached) return cached;
+    try {
+      const metadata = await global.conn.groupMetadata(global.conn.decodeJid(jid));
+      global.groupCache.set(jid, metadata, 300);
+      return metadata;
+    } catch (err) {
+      return {};
+    }
   },
   decodeJid: (jid) => {
     if (!jid) return jid;
@@ -297,42 +328,32 @@ const connectionOptions = {
     global.jidCache.set(jid, decoded);
     return decoded;
   },
-  markOnlineOnConnect: false,
-  generateHighQualityLinkPreview: true,
-  syncFullHistory: false,
-  downloadHistory: false,
-  shouldSyncHistory: false,
-  defaultQueryTimeoutMs: 60000,
-  connectTimeoutMs: 60000,
-  keepAliveIntervalMs: 10000,
-  printQRInTerminal: opzione === '1' || methodCodeQR,
-  cachedGroupMetadata: async (jid) => {
-    const cached = global.groupCache.get(jid);
-    if (cached) return cached;
-    try {
-      const metadata = await global.conn.groupMetadata(global.conn.decodeJid(jid));
-      global.groupCache.set(jid, metadata, { ttl: 300 });
-      return metadata;
-    } catch (err) {
-      console.error('Errore nel recupero dei metadati del gruppo:', err);
-      return {};
-    }
-  },
-  getMessage: async (key) => {
-    try {
-      const jid = global.conn.decodeJid(key.remoteJid);
-      const msg = await global.store.loadMessage(jid, key.id);
-      return msg?.message || undefined;
-    } catch (error) {
-      console.error('Errore in getMessage:', error);
-      return undefined;
-    }
-  },
   msgRetryCounterCache,
   msgRetryCounterMap,
-  retryRequestDelayMs: 500,
+  retryRequestDelayMs: 2000,
   maxMsgRetryCount: 5,
   shouldIgnoreJid: jid => false,
+  patchMessageBeforeSending: (message) => {
+    const requiresPatch = !!(
+      message.buttonsMessage ||
+      message.templateMessage ||
+      message.listMessage
+    );
+    if (requiresPatch) {
+      message = {
+        viewOnceMessage: {
+          message: {
+            messageContextInfo: {
+              deviceListMetadata: {},
+              deviceListMetadataVersion: 2
+            },
+            ...message
+          }
+        }
+      };
+    }
+    return message;
+  }
 };
 
 global.conn = makeWASocket(connectionOptions);
@@ -527,6 +548,42 @@ async function connectSubBots() {
   try {
     conn.ev.on('connection.update', connectionUpdate);
     conn.ev.on('creds.update', saveCreds);
+    conn.ev.on('messages.upsert', async (m) => {
+      const msg = m.messages[0];
+      if (msg?.message?.buttonsResponseMessage) {
+        const buttonId = msg.message.buttonsResponseMessage.selectedButtonId;
+        const from = msg.key.remoteJid;
+        const participant = msg.key.participant || from;
+        const buttonText = msg.message.buttonsResponseMessage.selectedDisplayText;
+        console.log(chalk.bold.cyan(`Bottone premuto: ${buttonId} (${buttonText}) da ${participant}`));
+        
+        if (global.handler) {
+          const fakeMsg = {
+            ...msg,
+            body: `!${buttonId}`,
+            type: 'buttonsResponseMessage'
+          };
+          await global.handler.handler(fakeMsg);
+        }
+      }
+      
+      if (msg?.message?.listResponseMessage) {
+        const listId = msg.message.listResponseMessage.title;
+        const selectedId = msg.message.listResponseMessage.listType;
+        const from = msg.key.remoteJid;
+        const participant = msg.key.participant || from;
+        console.log(chalk.bold.cyan(`Elemento lista selezionato: ${listId} - ${selectedId} da ${participant}`));
+        
+        if (global.handler) {
+          const fakeMsg = {
+            ...msg,
+            body: `!list ${listId} ${selectedId}`,
+            type: 'listResponseMessage'
+          };
+          await global.handler.handler(fakeMsg);
+        }
+      }
+    });
     console.log(chalk.bold.magenta(`
 ╭﹕₊˚ ★ ⁺˳ꕤ₊⁺・꒱
   ⋆  ︵︵ ★ ChatUnity connesso ★ ︵︵ ⋆
