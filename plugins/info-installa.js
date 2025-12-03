@@ -1,7 +1,7 @@
 import os from 'os'
 import util from 'util'
 import sizeFormatter from 'human-readable'
-import MessageType from '@whiskeysockets/baileys'
+import MessageType from '@chatunity/baileys'
 import fs from 'fs'
 const ims = './bb.jpg'
 import { performance } from 'perf_hooks'

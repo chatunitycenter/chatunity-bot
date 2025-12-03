@@ -1,4 +1,4 @@
-import { downloadContentFromMessage } from '@whiskeysockets/baileys'
+import { downloadContentFromMessage } from '@chatunity/baileys'
 
 let handler = async (m, { conn }) => {
     try {

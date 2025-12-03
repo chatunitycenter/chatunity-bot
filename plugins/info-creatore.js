@@ -1,4 +1,4 @@
-import pkg from '@whiskeysockets/baileys'
+import pkg from '@chatunity/baileys'
 const { generateWAMessageFromContent } = pkg
 
 let handler = async (m, { conn }) => {
