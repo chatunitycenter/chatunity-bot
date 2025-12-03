@@ -1,64 +1,83 @@
-import '../lib/language.js';
-import path from 'path';
-import { fileURLToPath } from 'url';
+// menu gruppo
+import '../lib/language.js'
+import path from 'path'
+import { fileURLToPath } from 'url'
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 const handler = async (message, { conn, usedPrefix, command }) => {
-    const userId = message.sender;
-    const groupId = message.isGroup ? message.chat : null;
-    const nomeDelBot = conn.user?.name || global.db?.data?.nomedelbot || 'ChatUnity';
-    
-    const menuText = generateMenuText(usedPrefix, userId, groupId);
-    const imagePath = path.join(__dirname, '../media/gruppo.jpeg');
-    
-    await conn.sendMessage(message.chat, {
-        image: { url: imagePath },
-        caption: menuText,
-        contextInfo: {
-            forwardingScore: 999,
-            isForwarded: true,
-            forwardedNewsletterMessageInfo: {
-                newsletterJid: '120363259442839354@newsletter',
-                serverMessageId: '',
-                newsletterName: nomeDelBot
-            }
+  const userId = message.sender
+  const groupId = message.isGroup ? message.chat : null
+  const nomeDelBot = conn.user?.name || global.db?.data?.nomedelbot || 'ChatUnity'
+
+  const menuText = generateMenuText(usedPrefix, userId, groupId)
+  const imagePath = path.join(__dirname, '../media/gruppo.jpeg')
+
+  await conn.sendMessage(
+    message.chat,
+    {
+      image: { url: imagePath },
+      caption: menuText,
+      contextInfo: {
+        forwardingScore: 999,
+        isForwarded: true,
+        forwardedNewsletterMessageInfo: {
+          newsletterJid: '120363259442839354@newsletter',
+          serverMessageId: '',
+          newsletterName: nomeDelBot
         }
-    }, { quoted: message });
-};
+      }
+    },
+    { quoted: message }
+  )
+}
 
-handler.help = ['menugruppo', 'gruppo'];
-handler.tags = ['menu'];
-handler.command = /^(gruppo|menugruppo)$/i;
+handler.help = ['menugruppo', 'gruppo']
+handler.tags = ['menu']
+handler.command = /^(gruppo|menugruppo)$/i
 
-export default handler;
+export default handler
 
 function generateMenuText(prefix, userId, groupId) {
-    const vs = global.vs || '8.0';
-    const collab = global.collab || 'ChatUnity x 333';
-    const menuTitle = global.t('groupMenuTitle', userId, groupId);
-    
-    const createSection = (title, commands) => {
-        const commandLines = commands.trim().split('\n').map(c => `│ ${c.trim()}`).join('\n');
-        return `╭★─ ${title} ─★╮\n${commandLines}\n╰★────────────★╯`;
-    };
-    
-    const sections = [
-        createSection(global.t('musicAudioSection', userId, groupId), `
+  const vs = global.vs || '8.0'
+  const collab = global.collab || 'ChatUnity x 333'
+  const menuTitle = global.t('groupMenuTitle', userId, groupId)
+
+  const createSection = (title, commands) => {
+    const commandLines = commands
+      .trim()
+      .split('\n')
+      .map(c => `│ ${c.trim()}`)
+      .join('\n')
+    return `╭★─ ${title} ─★╮\n${commandLines}\n╰★────────────★╯`
+  }
+
+  const sections = [
+    createSection(
+      global.t('musicAudioSection', userId, groupId),
+      `
 🎵 *.play* (${global.t('songCommand', userId, groupId)})
 🎥 *.playlist*
 🎥 *.ytsearch*
-🔊 *.tomp3* (${global.t('videoCommand', userId, groupId)})`),
-        createSection(global.t('infoUtilitySection', userId, groupId), `
+🔊 *.tomp3* (${global.t('videoCommand', userId, groupId)})
+    `
+    ),
+    createSection(
+      global.t('infoUtilitySection', userId, groupId),
+      `
 🌍 *.meteo* (${global.t('cityCommand', userId, groupId)})
 🌐 *.traduci* (${global.t('textCommand', userId, groupId)})
 ℹ️ *.info* [@${global.t('userCommand', userId, groupId)}]
 📜 *.regole*
 📜 *.dashboard*
 🔍 *.cercaimmagine*
-🛡️ *.offusca*`),
-        createSection(global.t('imageEditSection', userId, groupId), `
+🛡️ *.offusca*
+    `
+    ),
+    createSection(
+      global.t('imageEditSection', userId, groupId),
+      `
 🛠️ *.sticker* (${global.t('photoToStickerCommand', userId, groupId)})
 📷 *.hd* (${global.t('improveQualityCommand', userId, groupId)})
 🤕 *.bonk* (${global.t('memeCommand', userId, groupId)})
@@ -70,8 +89,12 @@ function generateMenuText(prefix, userId, groupId) {
 🤡 *.scherzo* @
 📱 *.nokia* @
 🚔 *.carcere* @
-📢 *.ads* @`),
-        createSection(global.t('pokemonSection', userId, groupId), `
+📢 *.ads* @
+    `
+    ),
+    createSection(
+      global.t('pokemonSection', userId, groupId),
+      `
 🥚 *.apripokemon*
 🛒 *.buypokemon* 
 🏆 *.classificapokemon*
@@ -81,8 +104,12 @@ function generateMenuText(prefix, userId, groupId) {
 🌑 *.darknessinfo*
 🎒 *.inventario*
 🍀 *.pity*
-🔄 *.scambia*`),
-        createSection(global.t('gamesCasinoSection', userId, groupId), `
+🔄 *.scambia*
+    `
+    ),
+    createSection(
+      global.t('gamesCasinoSection', userId, groupId),
+      `
 🎮 *.tris*
 🎲 *.dado*
 🎰 *.slot*
@@ -98,8 +125,12 @@ function generateMenuText(prefix, userId, groupId) {
 🏳️ *.bandiera*
 🎶 *.indovinacanzone*
 🤖 *.auto*
-🎯 *.missioni*`),
-        createSection(global.t('economyRankingSection', userId, groupId), `
+🎯 *.missioni*
+    `
+    ),
+    createSection(
+      global.t('economyRankingSection', userId, groupId),
+      `
 💰 *.portafoglio* (${global.t('balanceCommand', userId, groupId)})
 🏦 *.banca*
 💸 *.daily*
@@ -111,8 +142,12 @@ function generateMenuText(prefix, userId, groupId) {
 ⛏️ *.mina* (${global.t('earnXPCommand', userId, groupId)})
 📊 *.xp*
 ♾️ *.donaxp* @${global.t('userCommand', userId, groupId)}
-🎯 *.rubaxp* @${global.t('userCommand', userId, groupId)}`),
-        createSection(global.t('socialInteractionSection', userId, groupId), `
+🎯 *.rubaxp* @${global.t('userCommand', userId, groupId)}
+    `
+    ),
+    createSection(
+      global.t('socialInteractionSection', userId, groupId),
+      `
 💔 *.divorzia* (${global.t('endRelationshipCommand', userId, groupId)})
 💌 *.amore* @${global.t('userCommand', userId, groupId)} (${global.t('affinityCommand', userId, groupId)})
 💋 *.bacia* @${global.t('userCommand', userId, groupId)}
@@ -123,8 +158,12 @@ function generateMenuText(prefix, userId, groupId) {
 💋 *.ditalino* @
 💋 *.sega* @
 🖕 *.insulta* @
-👥 *.amicizia/listamici* @`),
-        createSection(global.t('howMuchSection', userId, groupId), `
+👥 *.amicizia/listamici* @
+    `
+    ),
+    createSection(
+      global.t('howMuchSection', userId, groupId),
+      `
 🏳️‍🌈 *.gay* @
 🏳️‍🌈 *.lesbica* @
 ♿ *.ritardato/a* @
@@ -132,13 +171,19 @@ function generateMenuText(prefix, userId, groupId) {
 ♿ *.disabile* @
 ♿ *.mongoloide* @
 ⚫ *.negro* @
-🐓 *.cornuto* @`),
-        createSection(global.t('personalityTestSection', userId, groupId), `
+🐓 *.cornuto* @
+    `
+    ),
+    createSection(
+      global.t('personalityTestSection', userId, groupId),
+      `
 🍺 *.alcolizzato*
-🌿 *.drogato*`)
-    ];
-    
-    return `
+🌿 *.drogato*
+    `
+    )
+  ]
+
+  return `
 ╭┈ ─ ─ ✦ ─ ─ ┈╮
    ୧ 👑 ୭ *${menuTitle}*
 ╰┈ ─ ─ ✦ ─ ─ ┈╯
@@ -151,6 +196,6 @@ ${sections.join('\n\n')}
 │ ୭ ˚. ᵎᵎ 🎀
 │ ${global.t('versionLabel', userId, groupId)}: ${vs}
 │ ${global.t('collabLabel', userId, groupId)}: ${collab}
-╰★────★────★╯`.trim();
+╰★────★────★╯
+`.trim()
 }
-
