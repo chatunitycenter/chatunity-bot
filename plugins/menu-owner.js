@@ -1,50 +1,55 @@
-import { performance } from 'perf_hooks';
-import fetch from 'node-fetch';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import fs from 'fs';
-import '../lib/language.js';
+import { performance } from 'perf_hooks'
+import fetch from 'node-fetch'
+import path from 'path'
+import { fileURLToPath } from 'url'
+import fs from 'fs'
+import '../lib/language.js'
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 const handler = async (message, { conn, usedPrefix, command }) => {
-    const userId = message.sender;
-    const groupId = message.isGroup ? message.chat : null;
+  const userId = message.sender
+  const groupId = message.isGroup ? message.chat : null
 
-    const menuText = generateMenuText(usedPrefix, userId, groupId);
-    const imagePath = path.join(__dirname, '../media/owner.jpeg');
+  const menuText = generateMenuText(usedPrefix, userId, groupId)
+  const imagePath = path.join(__dirname, '../media/owner.jpeg')
 
-    await conn.sendMessage(message.chat, {
-        image: { url: imagePath },
-        caption: menuText,
-        footer: global.t('chooseMenu', userId, groupId) || 'Scegli un menu:',
-        buttons: [
-            { buttonId: `${usedPrefix}menu`, buttonText: { displayText: global.t('mainMenuButton', userId, groupId) || "🏠 Menu Principale" }, type: 1 },
-            { buttonId: `${usedPrefix}menuadmin`, buttonText: { displayText: global.t('adminMenuButton', userId, groupId) || "🛡️ Menu Admin" }, type: 1 },
-            { buttonId: `${usedPrefix}menusicurezza`, buttonText: { displayText: global.t('securityMenuButton', userId, groupId) || "🚨 Menu Sicurezza" }, type: 1 },
-            { buttonId: `${usedPrefix}menugruppo`, buttonText: { displayText: global.t('groupMenuButton', userId, groupId) || "👥 Menu Gruppo" }, type: 1 },
-            { buttonId: `${usedPrefix}menuia`, buttonText: { displayText: global.t('aiMenuButton', userId, groupId) || "🤖 Menu IA" }, type: 1 }
-        ],
-        viewOnce: true,
-        headerType: 4
-    });
-};
+  await conn.sendMessage(
+    message.chat,
+    {
+      image: { url: imagePath },
+      caption: menuText,
+      footer: global.t('chooseMenu', userId, groupId) || 'Scegli un menu:',
+      buttons: [
+        { buttonId: `${usedPrefix}menu`, buttonText: { displayText: global.t('mainMenuButton', userId, groupId) || '🏠 Menu Principale' }, type: 1 },
+        { buttonId: `${usedPrefix}menuadmin`, buttonText: { displayText: global.t('adminMenuButton', userId, groupId) || '🛡️ Menu Admin' }, type: 1 },
+        { buttonId: `${usedPrefix}menusicurezza`, buttonText: { displayText: global.t('securityMenuButton', userId, groupId) || '🚨 Menu Sicurezza' }, type: 1 },
+        { buttonId: `${usedPrefix}menugruppo`, buttonText: { displayText: global.t('groupMenuButton', userId, groupId) || '👥 Menu Gruppo' }, type: 1 },
+        { buttonId: `${usedPrefix}menuia`, buttonText: { displayText: global.t('aiMenuButton', userId, groupId) || '🤖 Menu IA' }, type: 1 }
+      ],
+      viewOnce: true,
+      headerType: 4
+    }
+  )
+}
 
-handler.help = ['menuowner'];
-handler.tags = ['menu'];
-handler.command = /^(menuowner)$/i;
+handler.help = ['menuowner']
+handler.tags = ['menu']
+handler.command = /^(menuowner)$/i
 
-export default handler;
+export default handler
 
 function generateMenuText(prefix, userId, groupId) {
-    const vs = global.vs || '8.0';
-    const menuTitle = global.t('ownerMenuTitle', userId, groupId) || '𝑴𝑬𝑵𝑼 𝑶𝑾𝑵𝑬𝑹';
-    const versionText = global.t('versionLabel', userId, groupId) || '𝑽𝑬𝑹𝑺𝑰𝑶𝑵𝑬';
-    const collabText = global.t('collabLabel', userId, groupId) || '𝐂𝐎𝐋𝐋𝐀𝐁: 𝐎𝐍𝐄 𝐏𝐈𝐄𝐂𝐄';
-    const supportText = global.t('supportLabel', userId, groupId) || '𝐒𝐔𝐏𝐏𝐎𝐑𝐓𝐎';
+  const vs = global.vs || '8.0'
+  const collab = global.collab || 'ChatUnity x 333'
 
-    const commandList = `
+  const menuTitle = global.t('ownerMenuTitle', userId, groupId) || '𝑴𝑬𝑵𝑼 𝑶𝑾𝑵𝑬𝑹'
+  const versionText = global.t('versionLabel', userId, groupId) || '𝑽𝑬𝑹𝑺𝑰𝑶𝑵𝑬'
+  const collabText = global.t('collabLabel', userId, groupId) || '𝐂𝐎𝐋𝐋𝐀𝐁: 𝐎𝐍𝐄 𝐏𝐈𝐄𝐂𝐄'
+  const supportText = global.t('supportLabel', userId, groupId) || '𝐒𝐔𝐏𝐏𝐎𝐑𝐓𝐎'
+
+  const commandList = `
 • ⚙️ *${prefix}${global.t('setNameCommand', userId, groupId) || 'impostanome'}*
 • ⚙️ *${prefix}${global.t('resetNameCommand', userId, groupId) || 'resetnome'}*
 • ⚙️ *${prefix}${global.t('manageCommand', userId, groupId) || 'gestisci'}* @
@@ -75,12 +80,12 @@ function generateMenuText(prefix, userId, groupId) {
 • ⚙️ *${prefix}${global.t('restartCommand', userId, groupId) || 'riavvia'}*
 • ⚙️ *${prefix}${global.t('shutdownBotCommand', userId, groupId) || 'spegnibot'}*
 • ⚙️ *${prefix}${global.t('updateBotCommand', userId, groupId) || 'aggiornabot'}*
-    `.trim();
+  `.trim()
 
-    return `
+  return `
 ⋆ ︵︵ ★ ${menuTitle} ★ ︵︵ ⋆
 
-*${global.t('ownerReservedCommands', userId, groupId) || '𝑪𝑶𝑴𝑨𝑵𝑫𝑰 𝑹𝑰𝑺𝑬𝑹𝑻𝑨𝑽𝑰 𝑨𝑳𝑳’𝑶𝑾𝑵𝑬𝑹'}*
+*${global.t('ownerReservedCommands', userId, groupId) || '𝑪𝑶𝑴𝑨𝑵𝑫𝑰 𝑹𝑰𝑺𝑬𝑹𝑻𝑨𝑻𝑰 𝑨𝑳𝑳’𝑶𝑾𝑵𝑬𝑹'}*
 
 ꒷꒦ ✦ ୧・︶ : ︶ ꒷꒦ ‧₊ ୧
 ${commandList.split('\n').map(line => `୧ ${line.trim()}`).join('\n')}
@@ -91,5 +96,5 @@ ${commandList.split('\n').map(line => `୧ ${line.trim()}`).join('\n')}
   ୧・𝐂𝐎𝐋𝐋𝐀𝐁: ${collab}
   ୧・*${supportText}:* (.supporto)
 ╰♡꒷ ๑ ⋆˚₊⋆───ʚ˚ɞ───⋆˚₊⋆ ๑ ⪩
-`.trim();
+`.trim()
 }
