@@ -17,7 +17,7 @@ const handler = async (message, { conn, usedPrefix, command }) => {
 
   const menuText = generateMenuText(usedPrefix, botName, userCount, userId, groupId)
 
-  const videoPath = path.join(__dirname, '../menu/edit1.mp4')
+  const imagePath = path.join(__dirname, '../media/principale.jpeg')
 
   const adminMenuText = global.t('menuAdmin', userId, groupId) || '🛡️ Menu Admin'
   const ownerMenuText = global.t('menuOwner', userId, groupId) || '👑 Menu Owner'
@@ -28,7 +28,7 @@ const handler = async (message, { conn, usedPrefix, command }) => {
   await conn.sendMessage(
     message.chat,
     {
-      video: { url: videoPath },
+      image: { url: imagePath },
       caption: menuText,
       footer: global.t('menuFooter', userId, groupId) || 'Scegli un menu:',
       buttons: [
