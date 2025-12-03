@@ -1,4 +1,3 @@
-// menu principale
 import { performance } from 'perf_hooks'
 import fetch from 'node-fetch'
 import path from 'path'
@@ -18,9 +17,8 @@ const handler = async (message, { conn, usedPrefix, command }) => {
 
   const menuText = generateMenuText(usedPrefix, botName, userCount, userId, groupId)
 
-  const imagePath = path.join(__dirname, '../media/principale.jpeg')
+  const videoPath = path.join(__dirname, '../menu/edit1.mp4')
 
-  const footerText = global.t('menuFooter', userId, groupId) || 'Scegli un menu:'
   const adminMenuText = global.t('menuAdmin', userId, groupId) || '🛡️ Menu Admin'
   const ownerMenuText = global.t('menuOwner', userId, groupId) || '👑 Menu Owner'
   const securityMenuText = global.t('menuSecurity', userId, groupId) || '🚨 Menu Sicurezza'
@@ -30,9 +28,9 @@ const handler = async (message, { conn, usedPrefix, command }) => {
   await conn.sendMessage(
     message.chat,
     {
-      image: { url: imagePath },
+      video: { url: videoPath },
       caption: menuText,
-      footer: footerText,
+      footer: global.t('menuFooter', userId, groupId) || 'Scegli un menu:',
       buttons: [
         { buttonId: `${usedPrefix}menuadmin`, buttonText: { displayText: adminMenuText }, type: 1 },
         { buttonId: `${usedPrefix}menuowner`, buttonText: { displayText: ownerMenuText }, type: 1 },
@@ -70,7 +68,7 @@ function generateMenuText(prefix, botName, userCount, userId, groupId) {
   const suggestText = global.t('suggestCommand', userId, groupId) || 'consiglia'
   const newsText = global.t('newsCommand', userId, groupId) || 'novità'
   const versionText = global.t('versionLabel', userId, groupId) || '𝑽𝑬𝑹𝑺𝑰𝑶𝑵𝑬'
-  const collabText = global.t('collabLabel', userId, groupId) || '𝐂𝐎𝐋𝐋𝐀𝐁: 𝐎𝐍𝐄 𝐏𝐈𝐄𝐂𝐄'
+  const collabText = global.t('collabLabel', userId, groupId) || '𝐂𝐎𝐋𝐋𝐀𝐁'
   const usersText = global.t('usersLabel', userId, groupId) || '𝐔𝐓𝐄𝐍𝐓𝐈'
 
   return `
@@ -91,7 +89,7 @@ function generateMenuText(prefix, botName, userCount, userId, groupId) {
 ୧ 🗣️ ୭ *${prefix}gruppi*
 ╰♡꒷ ๑ ⋆˚₊⋆──ʚ˚ɞ──⋆˚₊⋆ ๑ ⪩
   ୧・*${versionText}:* ${vs}
-  ୧・𝐂𝐎𝐋𝐋𝐀𝐁: ${collab}
+  ୧・${collabText}: ${collab}
   ୧・${usersText}: ${userCount}
 ╰♡꒷ ๑ ⋆˚₊⋆──ʚ˚ɞ──⋆˚₊⋆ ๑ ⪩
 `.trim()
