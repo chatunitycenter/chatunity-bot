@@ -32,7 +32,7 @@
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "@bochilteam/scraper": "^5.0.1",
-    "@chatunity/baileys": "github:chatunitycenter/baileys",
+    "@chatunity/baileys": "latest",
     "@vitalets/google-translate-api": "^8.0.0",
     "acrcloud": "^1.4.0",
     "archiver": "^7.0.1",
