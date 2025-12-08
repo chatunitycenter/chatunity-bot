@@ -1,3 +1,4 @@
+import '../lib/language.js';
 // @type {import('@chatunity/baileys')}
 
 const { proto, generateWAMessage, areJidsSameUser, decryptPollVote, } = (await import('@chatunity/baileys')).default;
