@@ -236,6 +236,57 @@ export async function handler(chatUpdate) {
     const isBotAdmin = m.isGroup ? await isUserAdmin(this, m.chat, this.user.jid) : false
 
     const ___dirname = path.join(path.dirname(fileURLToPath(import.meta.url)), './plugins')
+    
+    // === GESTIONE PLUGIN.ALL (BOTTONI, LISTE, INTERATTIVI) ===
+    for (let name in global.plugins) {
+      let plugin = global.plugins[name]
+      if (!plugin || plugin.disabled) continue
+      const __filename = join(___dirname, name)
+      
+      // Esegui la funzione 'all' se presente nel plugin
+      if (typeof plugin.all === 'function') {
+        try {
+          await plugin.all.call(this, m, {
+            chatUpdate,
+            __dirname: ___dirname,
+            __filename
+          })
+        } catch (e) {
+          console.error(`Errore in plugin.all (${name}):`, e)
+        }
+      }
+      
+      // Salta plugin admin se restrict è disabilitato
+      if (!opts['restrict'] && plugin.tags?.includes('admin')) continue
+      
+      // Esegui la funzione 'before' se presente
+      if (typeof plugin.before === 'function') {
+        try {
+          const shouldContinue = await plugin.before.call(this, m, {
+            conn: this,
+            participants: normalizedParticipants,
+            groupMetadata,
+            user,
+            bot,
+            isROwner,
+            isOwner: isOwner2,
+            isRAdmin,
+            isAdmin,
+            isBotAdmin,
+            isPrems,
+            chatUpdate,
+            __dirname: ___dirname,
+            __filename
+          })
+          if (shouldContinue) continue
+        } catch (e) {
+          console.error(`Errore in plugin.before (${name}):`, e)
+        }
+      }
+    }
+    // === FINE GESTIONE PLUGIN.ALL ===
+
+    // Gestione comandi normali
     for (let name in global.plugins) {
       let plugin = global.plugins[name]
       if (!plugin || plugin.disabled) continue
@@ -386,6 +437,15 @@ export async function handler(chatUpdate) {
             for (let key of Object.values(global.APIKeys))
               textErr = textErr.replace(new RegExp(key, 'g'), '#HIDDEN#')
             m.reply(textErr)
+          }
+        } finally {
+          // Esegui la funzione 'after' se presente
+          if (typeof plugin.after === 'function') {
+            try {
+              await plugin.after.call(this, m, extra)
+            } catch (e) {
+              console.error(`Errore in plugin.after (${name}):`, e)
+            }
           }
         }
         break
