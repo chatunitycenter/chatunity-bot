@@ -40,7 +40,7 @@
     "axios": "^1.7.9",
     "cfonts": "^2.10.0",
     "chalk": "^5.4.1",
-    "cheerio": "1.0.0-rc.12",
+    "cheerio": "1.1.2",
     "colors": "^1.4.0",
     "file_size_url": "^1.0.4",
     "file-type": "^17.1.1",
