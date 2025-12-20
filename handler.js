@@ -24,17 +24,35 @@ global.groupMetaCache = global.groupMetaCache || new Map()
 const DUPLICATE_WINDOW = 3000
 const GROUP_META_CACHE_TTL = 300000
 
+const normalizeJid = async (conn, rawJid, extra = {}) => {
+  if (!rawJid) return null
+  let jid = conn.decodeJid ? conn.decodeJid(rawJid) : rawJid
+
+  if (/@lid$/.test(jid)) {
+    if (extra.senderPn) {
+      jid = extra.senderPn
+    } else if (typeof conn.getPNForLID === 'function') {
+      try {
+        const pn = await conn.getPNForLID(rawJid)
+        if (pn) jid = pn
+      } catch {}
+    }
+  }
+
+  return jid
+}
+
 function selectQueue(m) {
-  if (m.mtype?.includes('image') || m.mtype?.includes('video') || 
-      m.mtype?.includes('audio') || m.mtype?.includes('document') ||
-      m.mtype?.includes('sticker')) {
+  if (m.mtype?.includes('image') || m.mtype?.includes('video') ||
+    m.mtype?.includes('audio') || m.mtype?.includes('document') ||
+    m.mtype?.includes('sticker')) {
     return mediaQueue
   }
-  
+
   if (m.isCommand || (typeof m.text === 'string' && (m.text.startsWith('.') || m.text.startsWith('/')))) {
     return commandQueue
   }
-  
+
   return messageQueue
 }
 
@@ -44,30 +62,30 @@ export async function handler(chatUpdate) {
 
   this.msgqueque = this.msgqueque || []
   if (!chatUpdate) return
-  
+
   this.pushMessage(chatUpdate.messages).catch(console.error)
   let m = chatUpdate.messages[chatUpdate.messages.length - 1]
   if (!m) return
-  
+
   const msgId = m.key?.id
   if (!msgId) return
-  
+
   if (global.processedMessages.has(msgId)) return
   global.processedMessages.add(msgId)
   setTimeout(() => global.processedMessages.delete(msgId), DUPLICATE_WINDOW)
-  
+
   if (global.db.data == null) await global.loadDatabase()
 
   m = smsg(this, m) || m
   if (!m) return
 
   const ___dirname = path.join(path.dirname(fileURLToPath(import.meta.url)), './plugins')
-  
+
   for (let name in global.plugins) {
     let plugin = global.plugins[name]
     if (!plugin || plugin.disabled) continue
     const __filename = join(___dirname, name)
-    
+
     if (typeof plugin.all === 'function') {
       try {
         await plugin.all.call(this, m, {
@@ -82,7 +100,7 @@ export async function handler(chatUpdate) {
   }
 
   const queue = selectQueue(m)
-  
+
   await queue.add(async () => {
     try {
       await processMessage.call(this, m, chatUpdate, stats)
@@ -97,13 +115,18 @@ export async function handler(chatUpdate) {
 }
 
 async function processMessage(m, chatUpdate, stats) {
-  const isOwner = (() => {
+  const isOwner = await (async () => {
     try {
-      const isROwner = [this.decodeJid(global.conn.user.id), ...global.owner.map(([number]) => number)]
-        .filter(Boolean)
-        .map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net')
-        .includes(m.sender)
-      return isROwner || m.fromMe
+      const selfJid = await normalizeJid(this, this.user?.id || this.user?.jid)
+      const ownerJids = await Promise.all(
+        global.owner.map(async ([number]) => {
+          const base = number.replace(/[^0-9]/g, '') + '@s.whatsapp.net'
+          return await normalizeJid(this, base)
+        })
+      )
+      const allOwners = [selfJid, ...ownerJids].filter(Boolean)
+      const senderNorm = await normalizeJid(this, m.sender, { senderPn: m.key?.senderPn })
+      return allOwners.includes(senderNorm) || m.fromMe
     } catch {
       return false
     }
@@ -152,7 +175,7 @@ async function processMessage(m, chatUpdate, stats) {
     } else {
       groupData.count++
     }
-    if (groupData.count > 2) {
+    if (groupData.count > 10) {
       groupData.isSuspended = true
       groupData.suspendedUntil = now + 45000
 
@@ -253,9 +276,15 @@ async function processMessage(m, chatUpdate, stats) {
 
     if (typeof m.text !== 'string') m.text = ''
 
-    const isROwner = [this.decodeJid(global.conn.user.id), ...global.owner.map(([number]) => number)]
-      .map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net')
-      .includes(m.sender)
+    const selfNorm2 = await normalizeJid(this, global.conn.user.id)
+    const ownerList2 = await Promise.all(
+      global.owner.map(async ([number]) => {
+        const jid = number.replace(/[^0-9]/g, '') + '@s.whatsapp.net'
+        return await normalizeJid(this, jid)
+      })
+    )
+    const senderNormalized2 = await normalizeJid(this, m.sender, { senderPn: m.key?.senderPn })
+    const isROwner = [selfNorm2, ...ownerList2].includes(senderNormalized2)
     const isOwner2 = isROwner || m.fromMe
     const isMods = isOwner2 || global.mods.map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net').includes(m.sender)
     const isPrems = isROwner || isOwner2 || isMods || global.db.data.users[m.sender]?.premiumTime > 0
@@ -295,20 +324,30 @@ async function processMessage(m, chatUpdate, stats) {
     }
 
     const participants = (m.isGroup ? groupMetadata.participants : []) || []
-    const normalizedParticipants = participants.map(u => {
-      const normalizedId = this.decodeJid(u.id)
-      return { ...u, id: normalizedId, jid: u.jid || normalizedId }
-    })
-    const user = (m.isGroup ? normalizedParticipants.find(u => this.decodeJid(u.id) === m.sender) : {}) || {}
-    const bot = (m.isGroup ? normalizedParticipants.find(u => this.decodeJid(u.id) == this.user.jid) : {}) || {}
+    const normalizedParticipants = await Promise.all(participants.map(async u => {
+      const normalizedId = await normalizeJid(this, u.id)
+      const normalizedJid = u.jid ? await normalizeJid(this, u.jid) : normalizedId
+      return { ...u, id: normalizedId, jid: normalizedJid }
+    }))
+
+    const senderNorm = await normalizeJid(this, m.sender, { senderPn: m.key?.senderPn })
+    const botNorm = await normalizeJid(this, this.user.jid)
+
+    const user = (m.isGroup ? normalizedParticipants.find(u => u.id === senderNorm || u.jid === senderNorm) : {}) || {}
+    const bot = (m.isGroup ? normalizedParticipants.find(u => u.id === botNorm || u.jid === botNorm) : {}) || {}
 
     async function isUserAdmin(conn, chatId, senderId) {
       try {
-        const decodedSender = conn.decodeJid(senderId)
-        return groupMetadata?.participants?.some(p =>
-          (conn.decodeJid(p.id) === decodedSender || p.jid === decodedSender) &&
-          (p.admin === 'admin' || p.admin === 'superadmin')
-        ) || false
+        const decodedSender = await normalizeJid(conn, senderId)
+        const parts = groupMetadata?.participants || []
+        for (const p of parts) {
+          const pid = await normalizeJid(conn, p.id)
+          const pjid = p.jid ? await normalizeJid(conn, p.jid) : pid
+          if ((pid === decodedSender || pjid === decodedSender) && (p.admin === 'admin' || p.admin === 'superadmin')) {
+            return true
+          }
+        }
+        return false
       } catch {
         return false
       }
@@ -319,14 +358,14 @@ async function processMessage(m, chatUpdate, stats) {
     const isBotAdmin = m.isGroup ? await isUserAdmin(this, m.chat, this.user.jid) : false
 
     const ___dirname = path.join(path.dirname(fileURLToPath(import.meta.url)), './plugins')
-    
+
     for (let name in global.plugins) {
       let plugin = global.plugins[name]
       if (!plugin || plugin.disabled) continue
       const __filename = join(___dirname, name)
-      
+
       if (!opts['restrict'] && plugin.tags?.includes('admin')) continue
-      
+
       if (typeof plugin.before === 'function') {
         try {
           const shouldContinue = await plugin.before.call(this, m, {
@@ -559,7 +598,7 @@ async function processMessage(m, chatUpdate, stats) {
       stat.last = now
       if (!m.error) {
         stat.success += 1
-        stat.lastSuccess = now
+          stat.lastSuccess = now
       }
     }
 
@@ -707,6 +746,10 @@ global.dfail = (type, m, conn) => {
 const file = global.__filename(import.meta.url, true)
 watchFile(file, async () => {
   unwatchFile(file)
+  console.log(chalk.redBright("Update 'handler.js'"))
+  if (global.reloadHandler) console.log(await global.reloadHandler())
+})
+
   console.log(chalk.redBright("Update 'handler.js'"))
   if (global.reloadHandler) console.log(await global.reloadHandler())
 })
