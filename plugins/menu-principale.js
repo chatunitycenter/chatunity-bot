@@ -84,7 +84,7 @@ function generateMenuText(prefix, botName, userCount, userId, groupId) {
 ┃◈┃
 ┃◈└───────────┈⊷
 ┃◈┃• *${versionText}:* ${vs}
-┃◈┃•  ${collabLabel}: ${collab}
+┃◈┃•  𝐂𝐎𝐋𝐋𝐀𝐁: ${collab}
 ┃◈┃• *${supportText}:* (.supporto)
 ╰━━━━━━━━━━━━━┈·๏
 `.trim()

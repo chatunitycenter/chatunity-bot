@@ -2,44 +2,43 @@ import fs from 'fs';
 import fetch from 'node-fetch';
 
 const features = [
-  { key: 'antiLink',           label: 'AntiLink' },
-  { key: 'antiLinkHard',       label: 'Antilinkhard' },
-  { key: 'antimedia',          label: 'Antimedia' },
-  { key: 'antispamcomandi',    label: 'AntispamComandi' },
-  { key: 'welcome',            label: 'Benvenuto' },
-  { key: 'autosticker',        label: 'Autosticker' },
-  { key: 'antibot',            label: 'Antibot' },
-  { key: 'detect',             label: 'Detect' },
-  { key: 'risposte',           label: 'Risposte' },
-  { key: 'gpt',                label: 'GPT' },
-  { key: 'antispam',           label: 'Antispam' },
-  { key: 'antiviewonce',       label: 'Antiviewonce' },
-  { key: 'sologruppo',         label: 'SoloGruppo' },
-  { key: 'soloprivato',        label: 'SoloPrivato' },
-  { key: 'soloadmin',          label: 'soloadmin' },
-  { key: 'isBanned',           label: 'BanGruppo' },
-  { key: 'antinuke',           label: 'AntiNuke' },
-  { key: 'conclave',          label: 'Conclave' },
-  { key: 'antiCall',           label: 'AntiCall' },
-  { key: 'antiinsta',          label: 'Antiinsta' },
-  { key: 'antiporno',          label: 'Antiporno' },
-  { key: 'antitrava',          label: 'Antitrava' },
-  { key: 'antivirus',          label: 'Antivirus' },
-  { key: 'antivoip',           label: 'Antivoip' },
-  { key: 'antiArab',           label: 'Antiarab' },
-  { key: 'antisondaggi',       label: 'Antisondaggi' },
-  { key: 'antitiktok',         label: 'AntiTikTok' },
-  { key: 'chatbotPrivato',     label: 'ChatbotPrivato', ownerOnly: true },
-
+  { key: 'antiLink',            label: 'AntiLink' },
+  { key: 'antiLinkHard',        label: 'Antilinkhard' },
+  { key: 'antimedia',           label: 'Antimedia' },
+  { key: 'antispamcomandi',     label: 'AntispamComandi' },
+  { key: 'welcome',             label: 'Benvenuto' },
+  { key: 'autosticker',         label: 'Autosticker' },
+  { key: 'antibot',             label: 'Antibot' },
+  { key: 'detect',              label: 'Detect' },
+  { key: 'risposte',            label: 'Risposte' },
+  { key: 'gpt',                 label: 'GPT' },
+  { key: 'antispam',            label: 'Antispam' },
+  { key: 'antiviewonce',        label: 'Antiviewonce' },
+  { key: 'sologruppo',          label: 'SoloGruppo' },
+  { key: 'soloprivato',         label: 'SoloPrivato' },
+  { key: 'soloadmin',           label: 'soloadmin' },
+  { key: 'isBanned',            label: 'BanGruppo' },
+  { key: 'antinuke',            label: 'AntiNuke' },
+  { key: 'conclave',            label: 'Conclave' },
+  { key: 'antiCall',            label: 'AntiCall' },
+  { key: 'antiinsta',           label: 'Antiinsta' },
+  { key: 'antiporno',           label: 'Antiporno' },  // ✅ AGGIUNTO
+  { key: 'antitrava',           label: 'Antitrava' },
+  { key: 'antivirus',           label: 'Antivirus' },
+  { key: 'antivoip',            label: 'Antivoip' },
+  { key: 'antiArab',            label: 'Antiarab' },
+  { key: 'antisondaggi',        label: 'Antisondaggi' },
+  { key: 'antitiktok',          label: 'AntiTikTok' },
+  { key: 'chatbotPrivato',      label: 'ChatbotPrivato', ownerOnly: true },
 ];
 
 const MENU_HEADER = `
 ⋆ ︵︵ ★ 🔧 𝑴𝑬𝑵𝑼 𝑺𝑰𝑪𝑼𝑹𝑬𝑿𝒁𝑨 🔧 ★ ︵︵ ⋆
 
 ╭﹕₊˚ ★ ⁺˳ꕤ₊⁺・꒱
-  ━━✫ ℹ 𝐂𝐎𝐌𝐄 𝐒𝐈 𝐔𝐒𝐀
-  ━━✫ 🟢 attiva [funzione]
-  ━━✫ 🔴 disabilita [funzione]
+ ━━✫ ℹ 𝐂𝐎𝐌𝐄 𝐒𝐈 𝐔𝐒𝐀
+ ━━✫ 🟢 attiva [funzione]
+ ━━✫ 🔴 disabilita [funzione]
 ╰﹕₊˚ ★ ⁺˳ꕤ₊⁺・꒱
 
 ꒷꒦ ✦ ୧・︶ : ︶ ꒷꒦ ‧₊ ୧
@@ -49,8 +48,8 @@ const MENU_FOOTER = `
 ꒷꒦ ✦ ୧・︶ : ︶ ꒷꒦ ‧₊ ୧
 
 ╰♡꒷ ๑ ⋆˚₊⋆───ʚ˚ɞ───⋆˚₊⋆ ๑ ⪩
-  ୧・𝐂𝐎𝐋𝐋𝐀𝐁: 𝐎𝐍𝐄 𝐏𝐈𝐄𝐂𝐄
-  ୧・*𝐒𝐔𝐏𝐏𝐎𝐑𝐓𝐎:* (.supporto)
+ ୧・𝐂𝐎𝐋𝐋𝐀𝐁: 𝐎𝐍𝐄 𝐏𝐈𝐄𝐂𝐄
+ ୧・*𝐒𝐔𝐏𝐏𝐎𝐑𝐓𝐎:* (.supporto)
 ╰♡꒷ ๑ ⋆˚₊⋆───ʚ˚ɞ───⋆˚₊⋆ ๑ ⪩
 `;
 
@@ -86,7 +85,7 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner, isAdmin, isR
     } else if (f.key === 'antivoip') {
       current = (global.db?.data?.chats?.[m.chat]?.antivoip) || false;
     } else {
-      current = chatData[f.key];
+      current = chatData[f.key];  // ✅ Funziona anche per antiporno
     }
 
     const dot = current ? '🟢' : '🔴';
@@ -140,7 +139,7 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner, isAdmin, isR
     if (!global.privateChatbot) global.privateChatbot = {};
     global.privateChatbot[m.sender] = setTo;
   } else {
-    chatData[selected.key] = setTo;
+    chatData[selected.key] = setTo;  // ✅ Include antiporno
   }
 
   if (global.db?.data?.chats) {
