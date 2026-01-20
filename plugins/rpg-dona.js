@@ -1,4 +1,4 @@
-import MessageType from '@chatunity/baileys'
+import MessageType from '@whiskeysockets/baileys'
 
 let tassa = 0.02 // 2% di tassa sulle transazioni
 
