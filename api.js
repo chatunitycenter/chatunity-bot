@@ -125,6 +125,9 @@ global.moment = moment      // Date/time handling
 /**
  * RPG utility object with emoticon mapping functionality.
  * Used for displaying appropriate emojis in RPG game features.
+ * 
+ * @note The emotttt mapping object should be defined elsewhere in the codebase.
+ *       If not defined, the emoticon function will return empty string.
  */
 global.rpg = {
   /**
@@ -135,6 +138,9 @@ global.rpg = {
    * @returns {string} Matching emoticon or empty string
    */
   emoticon(string) {
+    // Safety check: ensure emotttt exists before using
+    if (typeof emotttt === 'undefined') return ''
+    
     string = string.toLowerCase()
     
     // Match string against emoticon patterns
