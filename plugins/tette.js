@@ -1,5 +1,4 @@
-let handler = async (m, { conn }) => {
-  // Controlla menzione o messaggio quotato
+let handler = async (m, { conn }) =>  
   let user = m.mentionedJid && m.mentionedJid[0]
     ? m.mentionedJid[0]
     : m.quoted
