@@ -154,4 +154,4 @@ Grazie a tutti coloro che hanno contribuito a questo progetto!
 
 
 
-##COPIAMO SAM IN TUTTO🫩🫰🏻
+## COPIAMO SAM IN TUTTO🫩🫰🏻
